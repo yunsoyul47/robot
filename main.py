@@ -1109,9 +1109,3 @@ st.markdown(
     -webkit-text-fill-color: #071820 !important;
 }
 
-/* 설계 진단 제목 */
-h2, h3 {
-    color: #ffffff !important;
-    opacity: 1 !important;
-    font-weight: 800 !important;
-}
