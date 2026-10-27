@@ -112,7 +112,7 @@ div[data-testid="stMetricValue"] {
     color: #ffffff !important;
 }
 
-/* 위젯 일반 라벨 스타일 조정 (설계 목표 등) */
+/* 위젯 라벨 스타일 (설계 목표 등) */
 [data-testid="stWidgetLabel"] p,
 [data-testid="stWidgetLabel"] label {
     color: #65e2d1 !important;
@@ -125,7 +125,7 @@ div[data-testid="stMetricValue"] {
     opacity: 1;
 }
 
-/* 사이드바 Markdown 텍스트 보정 (설계 목표 제목) */
+/* 사이드바 제목 보정 */
 [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] strong,
 [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] b {
     color: #65e2d1 !important;
@@ -174,27 +174,48 @@ div[data-testid="stMetricValue"] {
 }
 
 /* ---------------------------------------------------------
-   흐린 글씨 & 흰색 배경 커스텀 보정 (가독성 강화)
+   선택창 (Selectbox) 민트색 보정 스타일
 --------------------------------------------------------- */
 
-/* 1. Selectbox (드롭다운) 스타일 */
+/* Selectbox 외곽 상자 */
 div[data-baseweb="select"] > div {
     background-color: #162b47 !important;
-    border: 1px solid #365378 !important;
-    color: #ffffff !important;
+    border: 1px solid #65e2d1 !important;
+    color: #65e2d1 !important;
     border-radius: 8px !important;
 }
 
-div[data-baseweb="select"] span {
-    color: #ffffff !important;
+/* Selectbox 선택된 글씨 (민트색 & 진하게) */
+div[data-baseweb="select"] span,
+div[data-baseweb="select"] div {
+    color: #65e2d1 !important;
     font-weight: 700 !important;
 }
 
+/* Selectbox 드롭다운 화살표 */
 div[data-baseweb="select"] svg {
     fill: #65e2d1 !important;
+    color: #65e2d1 !important;
 }
 
-/* 2. Text Input (텍스트 입력창) 스타일 */
+/* 드롭다운 클릭 시 열리는 옵션 메뉴 팝업 */
+ul[data-baseweb="menu"] {
+    background-color: #101c2e !important;
+    border: 1px solid #293b53 !important;
+}
+
+ul[data-baseweb="menu"] li,
+ul[data-baseweb="menu"] li div,
+ul[data-baseweb="menu"] li span {
+    color: #65e2d1 !important;
+    font-weight: 600 !important;
+}
+
+ul[data-baseweb="menu"] li:hover {
+    background-color: #162b47 !important;
+}
+
+/* 텍스트 입력창 (stTextInput) 스타일 */
 div[data-testid="stTextInput"] input {
     background-color: #162b47 !important;
     color: #ffffff !important;
@@ -203,7 +224,7 @@ div[data-testid="stTextInput"] input {
     font-weight: 600 !important;
 }
 
-/* 3. Expander (설계 사양 조정 접기/펴기) 스타일 */
+/* 익스팬더 (stExpander) 헤더 스타일 */
 div[data-testid="stExpander"] {
     background-color: #101c2e !important;
     border: 1px solid #293b53 !important;
