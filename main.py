@@ -1054,3 +1054,64 @@ st.markdown(
     '<div class="footer">ROBO LAB · EDUCATIONAL ROBOT DESIGN SIMULATOR · ESTIMATES ONLY</div>',
     unsafe_allow_html=True,
 )
+/* 그래프 축 숫자와 라벨을 선명하게 */
+[data-testid="stChart"] text,
+[data-testid="stVegaLiteChart"] text,
+.stChart text {
+    fill: #24364d !important;
+    color: #24364d !important;
+    opacity: 1 !important;
+    font-weight: 700 !important;
+}
+
+/* 그래프 주변 설명 글씨 */
+[data-testid="stMarkdownContainer"] p,
+[data-testid="stMarkdownContainer"] li {
+    color: #f1f5fb !important;
+    opacity: 1 !important;
+}
+
+/* 설계 진단 안내 상자 */
+[data-testid="stAlert"] {
+    background-color: #142b46 !important;
+    border: 1px solid #42658b !important;
+    opacity: 1 !important;
+}
+
+[data-testid="stAlert"] p,
+[data-testid="stAlert"] span,
+[data-testid="stAlert"] div {
+    color: #ffffff !important;
+    opacity: 1 !important;
+    font-weight: 600 !important;
+}
+
+/* CSV 다운로드 버튼: 비활성화처럼 흐리게 보이는 현상 방지 */
+[data-testid="stDownloadButton"] button,
+[data-testid="stDownloadButton"] button p,
+[data-testid="stDownloadButton"] button span {
+    background-color: #eaf2ff !important;
+    color: #102033 !important;
+    -webkit-text-fill-color: #102033 !important;
+    font-weight: 800 !important;
+    opacity: 1 !important;
+    text-shadow: none !important;
+}
+
+[data-testid="stDownloadButton"] button:hover {
+    background-color: #65e2d1 !important;
+    border-color: #65e2d1 !important;
+}
+
+[data-testid="stDownloadButton"] button:hover p,
+[data-testid="stDownloadButton"] button:hover span {
+    color: #071820 !important;
+    -webkit-text-fill-color: #071820 !important;
+}
+
+/* 설계 진단 제목 */
+h2, h3 {
+    color: #ffffff !important;
+    opacity: 1 !important;
+    font-weight: 800 !important;
+}
