@@ -4,10 +4,11 @@ import io
 import streamlit as st
 import pandas as pd
 
+# 기본 페이지값을 먼저 지정하고, 사이드바 선택값으로 아래에서 갱신합니다.
 page = "설계 연구소"
 
 # ============================================================
-# ROBO LAB — Robot Design Simulator
+# ROBO LAB — Single-file Streamlit robot design simulator
 # ============================================================
 
 st.set_page_config(
@@ -23,21 +24,20 @@ st.markdown(
     @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
 
     :root {
-        --ink: #F1F5FC;
-        --muted: #C5D3E6;
-        --panel: #121C2B;
-        --line: #40536D;
-        --blue: #6BA8FF;
-        --cyan: #65E2D1;
+        --ink: #e8eef8;
+        --muted: #9aa9bf;
+        --panel: #121c2b;
+        --line: #26354a;
+        --blue: #6ba8ff;
+        --cyan: #65e2d1;
     }
 
-    /* 기본 화면 */
     .stApp {
         background: radial-gradient(
             ellipse at 10% 0%,
-            #162B47 0%,
-            #0B1220 43%,
-            #080D16 100%
+            #162b47 0%,
+            #0b1220 43%,
+            #080d16 100%
         );
         color: var(--ink);
     }
@@ -46,49 +46,27 @@ st.markdown(
         font-family: 'Manrope', sans-serif;
     }
 
-    /* 기본 글씨 색상 및 대비 */
-    [data-testid="stAppViewContainer"],
-    [data-testid="stAppViewContainer"] p,
-    [data-testid="stAppViewContainer"] label,
-    [data-testid="stAppViewContainer"] li {
-        color: #F1F5FC;
-    }
-
-    h1, h2, h3 {
-        color: #F5F8FF !important;
-        letter-spacing: -0.04em;
-    }
-
-    [data-testid="stMarkdownContainer"] p,
-    [data-testid="stMarkdownContainer"] li,
-    [data-testid="stCaptionContainer"],
-    [data-testid="stCaptionContainer"] p {
-        color: #D6E1F0 !important;
-    }
-
-    /* 사이드바 */
     [data-testid="stSidebar"] {
-        background: #0C1421;
-        border-right: 1px solid #40536D;
+        background: #0c1421;
+        border-right: 1px solid #26354a;
     }
 
     [data-testid="stSidebar"] * {
-        color: #F1F5FC;
+        color: #e8eef8;
     }
 
-    [data-testid="stSidebar"] [data-testid="stWidgetLabel"] {
-        color: #F1F5FC !important;
+    h1, h2, h3 {
+        letter-spacing: -0.04em;
     }
 
-    /* 상단 소개 영역 */
     .hero {
         padding: 24px 26px;
-        border: 1px solid #40536D;
+        border: 1px solid #2b4260;
         border-radius: 20px;
         background: linear-gradient(
             120deg,
-            rgba(28, 53, 83, .98),
-            rgba(14, 25, 41, .98)
+            rgba(28,53,83,.92),
+            rgba(14,25,41,.92)
         );
         margin-bottom: 22px;
     }
@@ -97,280 +75,200 @@ st.markdown(
         font-family: 'DM Mono', monospace;
         font-size: 11px;
         letter-spacing: 2px;
-        color: #65E2D1;
-        font-weight: 700;
+        color: #65e2d1;
     }
 
     .hero-title {
-        font-size: clamp(32px, 4vw, 52px);
+        font-size: clamp(32px,4vw,52px);
         line-height: 1.08;
         font-weight: 800;
         margin: 8px 0 10px;
-        color: #FFFFFF;
+        color: #f2f7ff;
     }
 
     .hero-sub {
-        color: #D6E3F4;
+        color: #aab9cd;
         font-size: 14px;
         max-width: 760px;
-        line-height: 1.8;
+        line-height: 1.7;
     }
 
     .section-kicker {
         font-family: 'DM Mono', monospace;
-        color: #65E2D1;
+        color: #65e2d1;
         font-size: 11px;
         letter-spacing: 1.6px;
         margin-bottom: 4px;
-        font-weight: 700;
     }
 
-    /* 패널 */
     .panel {
-        border: 1px solid #40536D;
-        background: rgba(18, 28, 43, .92);
+        border: 1px solid #26354a;
+        background: rgba(18,28,43,.78);
         padding: 17px 18px;
         border-radius: 16px;
     }
 
     .tiny-label {
-        color: #C5D3E6 !important;
+        color: #94a7c0;
         font-size: 12px;
     }
 
     .big-value {
         font-size: 26px;
         font-weight: 800;
-        color: #F5F8FF;
+        color: #edf5ff;
         letter-spacing: -1px;
     }
 
     .unit {
-        color: #C5D3E6 !important;
+        color: #8fa4bf;
         font-size: 12px;
     }
 
     .note {
-        color: #C5D3E6 !important;
+        color: #9aabc2;
         font-size: 12px;
-        line-height: 1.75;
+        line-height: 1.65;
     }
 
     .status-pill {
         display: inline-block;
         padding: 5px 9px;
         border-radius: 999px;
-        border: 1px solid #32736D;
-        background: #102E30;
-        color: #9AFFF0;
+        border: 1px solid #285c59;
+        background: #102e30;
+        color: #80f0df;
         font-size: 10px;
         font-family: 'DM Mono', monospace;
         letter-spacing: 1px;
-        font-weight: 700;
     }
 
-    /* 성능 지표 */
     div[data-testid="stMetric"] {
-        background: rgba(18, 28, 43, .95);
-        border: 1px solid #40536D;
+        background: rgba(18,28,43,.84);
+        border: 1px solid #26354a;
         padding: 15px 17px;
         border-radius: 14px;
     }
 
-    [data-testid="stMetricLabel"],
-    [data-testid="stMetricLabel"] * {
-        color: #D6E1F0 !important;
-        font-weight: 600 !important;
+    div[data-testid="stMetricLabel"] {
+        color: #9aabc2;
     }
 
-    [data-testid="stMetricValue"],
-    [data-testid="stMetricValue"] * {
-        color: #FFFFFF !important;
-        font-weight: 800 !important;
+    div[data-testid="stMetricValue"] {
+        color: #eff6ff;
     }
 
-    [data-testid="stMetricDelta"] {
-        color: #9AFFF0 !important;
-    }
-
-    /* 버튼 */
     .stButton > button,
     .stDownloadButton > button {
         border-radius: 10px;
         font-weight: 700;
         min-height: 42px;
-        border: 1px solid #526987;
     }
 
     .stButton > button[kind="primary"] {
-        background: #6BA8FF;
-        color: #07111E;
+        background: #6ba8ff;
+        color: #07111e;
         border: 0;
     }
 
-    .stButton > button:hover,
-    .stDownloadButton > button:hover {
-        border-color: #65E2D1;
-        color: #FFFFFF;
+    /* CSV 다운로드 버튼 글씨 가독성 개선 */
+    [data-testid="stDownloadButton"] button {
+        background-color: #EAF2FF !important;
+        color: #102033 !important;
+        border: 1px solid #8BA6C8 !important;
+        font-weight: 800 !important;
+        opacity: 1 !important;
+    }
+
+    [data-testid="stDownloadButton"] button * {
+        color: #102033 !important;
+        fill: #102033 !important;
+        opacity: 1 !important;
+    }
+
+    [data-testid="stDownloadButton"] button:hover {
+        background-color: #65E2D1 !important;
+        color: #071820 !important;
+        border-color: #65E2D1 !important;
+    }
+
+    [data-testid="stDownloadButton"] button:hover * {
+        color: #071820 !important;
+        fill: #071820 !important;
     }
 
     hr {
-        border-color: #40536D;
+        border-color: #26354a;
     }
 
-    /* 로봇 개념도 */
     .robot-svg-wrap {
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(145deg, #101C2D, #0B1320);
-        border: 1px solid #40536D;
+        background: linear-gradient(145deg,#101c2d,#0b1320);
+        border: 1px solid #26354a;
         border-radius: 18px;
         padding: 16px;
         min-height: 240px;
     }
 
     .footer {
-        color: #B8C8DC;
+        color: #7387a2;
         font-size: 11px;
         text-align: center;
         padding: 24px 0 10px;
     }
 
-    /* ======================================================
-       가독성 개선 CSS
-       어두운 배경에서 흐릿하게 보이는 글씨의 대비를 높임
-       ====================================================== */
+    /* 어두운 배경 위의 글씨 대비 개선 */
+    [data-testid="stAppViewContainer"] {
+        color: #f1f5fb;
+    }
 
-    /* 슬라이더, 입력창 등 모든 위젯 라벨 */
-    [data-testid="stWidgetLabel"],
-    [data-testid="stWidgetLabel"] *,
+    [data-testid="stWidgetLabel"] p,
+    [data-testid="stWidgetLabel"] label,
+    [data-testid="stMarkdownContainer"] p,
+    [data-testid="stCaptionContainer"],
+    [data-testid="stCaptionContainer"] p,
+    [data-testid="stHelp"],
     [data-testid="stSlider"] label,
     [data-testid="stSelectbox"] label,
     [data-testid="stTextInput"] label,
     [data-testid="stNumberInput"] label,
     [data-testid="stRadio"] label,
-    [data-testid="stCheckbox"] label,
-    [data-testid="stMultiSelect"] label {
-        color: #F1F5FC !important;
-        font-weight: 600 !important;
+    [data-testid="stCheckbox"] label {
+        color: #e2eaf6 !important;
     }
 
-    /* 입력창 아래 설명과 도움말 */
-    [data-testid="stCaptionContainer"],
-    [data-testid="stCaptionContainer"] *,
-    [data-testid="stHelp"],
-    [data-testid="stMarkdownContainer"] p {
-        color: #D6E1F0 !important;
-    }
-
-    /* 펼치기 메뉴 */
-    [data-testid="stExpander"] details {
-        background-color: #111D2E !important;
-        border: 1px solid #40536D !important;
-        border-radius: 10px !important;
-    }
-
+    [data-testid="stExpander"] details,
     [data-testid="stExpander"] summary,
     [data-testid="stExpander"] summary:hover {
-        background-color: #1A2A40 !important;
-        color: #FFFFFF !important;
-        border-color: #526987 !important;
-        border-radius: 8px !important;
+        background-color: #111d2e !important;
+        color: #f1f6ff !important;
+        border-color: #354963 !important;
     }
 
     [data-testid="stExpander"] summary p,
     [data-testid="stExpander"] summary span,
     [data-testid="stExpander"] summary svg {
-        color: #FFFFFF !important;
-        fill: #FFFFFF !important;
-        font-weight: 700 !important;
+        color: #f1f6ff !important;
+        fill: #f1f6ff !important;
     }
 
-    /* 슬라이더 수치 */
     [data-testid="stSlider"] [data-testid="stMarkdownContainer"] p {
-        color: #FFFFFF !important;
-        font-weight: 700 !important;
+        color: #dce7f5 !important;
     }
 
-    [data-testid="stSlider"] [role="slider"] {
-        border-color: #FF5A64 !important;
+    [data-testid="stMetricLabel"] *,
+    .tiny-label,
+    .unit,
+    .note {
+        color: #c0cee0 !important;
     }
 
-    /* 입력창: 밝은 배경과 어두운 글씨 */
     input,
-    textarea {
-        background-color: #F1F5FC !important;
-        color: #101827 !important;
-        border-color: #71839D !important;
-        caret-color: #101827 !important;
-    }
-
-    input::placeholder,
-    textarea::placeholder {
-        color: #526176 !important;
-        opacity: 1 !important;
-    }
-
-    /* 드롭다운 선택 상자 */
+    textarea,
     [data-baseweb="select"] > div {
-        background-color: #F1F5FC !important;
-        border-color: #71839D !important;
         color: #101827 !important;
-    }
-
-    [data-baseweb="select"] input,
-    [data-baseweb="select"] span,
-    [data-baseweb="select"] div {
-        color: #101827 !important;
-    }
-
-    /* 드롭다운 목록 */
-    [role="listbox"],
-    [role="option"] {
-        background-color: #F1F5FC !important;
-        color: #101827 !important;
-    }
-
-    [role="option"] * {
-        color: #101827 !important;
-    }
-
-    [role="option"]:hover {
-        background-color: #DCE8F7 !important;
-    }
-
-    /* 체크박스와 라디오 */
-    [data-testid="stCheckbox"] label,
-    [data-testid="stRadio"] label {
-        color: #F1F5FC !important;
-    }
-
-    /* 경고, 성공, 정보 메시지 */
-    [data-testid="stAlert"] p,
-    [data-testid="stAlert"] span {
-        color: #F1F5FC !important;
-    }
-
-    /* 표 */
-    [data-testid="stDataFrame"],
-    [data-testid="stTable"] {
-        border: 1px solid #40536D;
-        border-radius: 8px;
-    }
-
-    /* 그래프 영역 설명 */
-    [data-testid="stVegaLiteChart"],
-    [data-testid="stArrowVegaLiteChart"] {
-        color: #F1F5FC !important;
-    }
-
-    /* 키보드 접근 시 테두리 표시 */
-    button:focus-visible,
-    input:focus-visible,
-    textarea:focus-visible {
-        outline: 2px solid #65E2D1 !important;
-        outline-offset: 2px !important;
     }
     </style>
     """,
@@ -378,10 +276,7 @@ st.markdown(
 )
 
 
-# ============================================================
-# 물리 계산 함수
-# ============================================================
-
+# ---------- Physics helpers ----------
 def calculate_robot(
     mass,
     motor_w,
@@ -396,7 +291,7 @@ def calculate_robot(
     slope_deg,
     payload_kg,
 ):
-    """단순화한 물리 모델. 실제 하드웨어 성능을 보장하지 않는 추정값입니다."""
+    """단순화한 물리 모델로 로봇 성능을 추정합니다."""
 
     total_mass = max(0.1, mass + payload_kg)
     radius = max(0.01, wheel_radius_cm / 100.0)
@@ -472,13 +367,8 @@ def calculate_robot(
     }
 
 
-# ============================================================
-# 로봇 SVG 개념도
-# ============================================================
-
 def robot_svg(wheel_radius_cm, mass, motor_count, color="#6ba8ff"):
-    """외부 이미지 없이 코드 내부에서 로봇 개념도를 생성합니다."""
-
+    """외부 이미지 없이 로봇 개념도를 생성합니다."""
     wheel_r = max(12, min(25, wheel_radius_cm * 1.2))
 
     return f"""
@@ -497,29 +387,19 @@ def robot_svg(wheel_radius_cm, mass, motor_count, color="#6ba8ff"):
         </linearGradient>
       </defs>
 
-      <ellipse cx="210" cy="174" rx="145" ry="24"
-               fill="url(#floorGrad)"/>
-
-      <path d="M78 137 L122 104 L300 104 L345 137
-               L302 161 L120 161 Z"
+      <ellipse cx="210" cy="174" rx="145" ry="24" fill="url(#floorGrad)"/>
+      <path d="M78 137 L122 104 L300 104 L345 137 L302 161 L120 161 Z"
             fill="#17263a" stroke="#45617f" stroke-width="2"/>
-
       <path d="M122 104 L300 104 L330 125 L100 125 Z"
             fill="#29415f" stroke="#547397" stroke-width="1.5"/>
-
       <path d="M100 125 L330 125 L302 151 L120 151 Z"
             fill="url(#bodyGrad)" stroke="#7cb5ff" stroke-width="1.5"/>
-
-      <path d="M155 91 L180 76 L260 76 L286 91
-               L270 105 L170 105 Z"
+      <path d="M155 91 L180 76 L260 76 L286 91 L270 105 L170 105 Z"
             fill="#1d3048" stroke="#6ba8ff" stroke-width="1.5"/>
-
-      <rect x="187" y="63" width="46" height="17"
-            rx="5" fill="#65e2d1" fill-opacity=".85"/>
-
+      <rect x="187" y="63" width="46" height="17" rx="5"
+            fill="#65e2d1" fill-opacity=".85"/>
       <circle cx="210" cy="61" r="7"
               fill="#65e2d1" stroke="#b7fff4" stroke-width="2"/>
-
       <path d="M210 52 V39 M202 44 L210 36 L218 44"
             stroke="#65e2d1" stroke-width="2"
             fill="none" stroke-linecap="round"/>
@@ -543,22 +423,18 @@ def robot_svg(wheel_radius_cm, mass, motor_count, color="#6ba8ff"):
             stroke-width="2" stroke-dasharray="5 5"/>
 
       <text x="210" y="194" text-anchor="middle"
-            fill="#d6e3f4" font-family="monospace" font-size="11">
+            fill="#9fb4ce" font-family="monospace" font-size="11">
         CONCEPT MODEL • {mass:.1f} kg • {motor_count} MOTOR(S)
       </text>
 
       <text x="210" y="211" text-anchor="middle"
-            fill="#b8c8dc" font-family="monospace" font-size="9">
+            fill="#607995" font-family="monospace" font-size="9">
         ILLUSTRATIVE DESIGN — NOT A CAD MODEL
       </text>
     </svg>
     </div>
     """
 
-
-# ============================================================
-# 설계 입력 함수
-# ============================================================
 
 def make_design(prefix, defaults):
     st.markdown(f"### {prefix} · {defaults['name']}")
@@ -681,10 +557,7 @@ def make_design(prefix, defaults):
     return params, result
 
 
-# ============================================================
-# 상단 소개
-# ============================================================
-
+# ---------- Header ----------
 st.markdown(
     """
     <div class="hero">
@@ -703,11 +576,6 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
-
-
-# ============================================================
-# 사이드바
-# ============================================================
 
 with st.sidebar:
     st.markdown("## 🤖 ROBO LAB")
@@ -735,19 +603,9 @@ with st.sidebar:
     )
 
     st.markdown(
-        """
-        <p class="note">
-        모든 결과는 단순화한 이론 모델에 따른 추정값입니다.
-        실제 제작 전에는 부품 사양과 안전 한계를 확인해야 합니다.
-        </p>
-        """,
+        '<p class="note">모든 결과는 단순화한 이론 모델에 따른 추정값입니다. 실제 제작 전에는 부품 사양과 안전 한계를 확인해야 합니다.</p>',
         unsafe_allow_html=True,
     )
-
-
-# ============================================================
-# 기본 설계값
-# ============================================================
 
 defaults_a = {
     "name": "Explorer A",
@@ -783,7 +641,7 @@ defaults_b = {
 
 
 # ============================================================
-# 1. 설계 연구소
+# 설계 연구소
 # ============================================================
 
 if page == "설계 연구소":
@@ -791,11 +649,9 @@ if page == "설계 연구소":
         '<div class="section-kicker">01 / CONFIGURATION</div>',
         unsafe_allow_html=True,
     )
-
     st.header("로봇 설계")
     st.write(
-        "왼쪽 메뉴에서 설계 목표를 선택하고, "
-        "아래에서 로봇의 사양을 조절하세요."
+        "왼쪽 메뉴에서 설계 목표를 선택하고, 아래에서 로봇의 사양을 조절하세요."
     )
 
     params, result = make_design("A", defaults_a)
@@ -807,7 +663,6 @@ if page == "설계 연구소":
             '<div class="section-kicker">DESIGN PREVIEW</div>',
             unsafe_allow_html=True,
         )
-
         st.markdown(
             robot_svg(
                 params["wheel_radius"],
@@ -816,10 +671,7 @@ if page == "설계 연구소":
             ),
             unsafe_allow_html=True,
         )
-
-        st.caption(
-            "개념도: 실제 크기·부품 배치·CAD 형상을 나타내지 않습니다."
-        )
+        st.caption("개념도: 실제 크기·부품 배치·CAD 형상을 나타내지 않습니다.")
 
     with right:
         st.markdown(
@@ -828,41 +680,22 @@ if page == "설계 연구소":
         )
 
         m1, m2 = st.columns(2)
-        m1.metric(
-            "예상 최고 속도",
-            f'{result["speed_kmh"]:.1f} km/h',
-        )
-        m2.metric(
-            "예상 작동 시간",
-            f'{result["runtime_minutes"]:.0f} min',
-        )
+        m1.metric("예상 최고 속도", f'{result["speed_kmh"]:.1f} km/h')
+        m2.metric("예상 작동 시간", f'{result["runtime_minutes"]:.0f} min')
 
         m3, m4 = st.columns(2)
-        m3.metric(
-            "이론적 구동력",
-            f'{result["traction_force"]:.1f} N',
-        )
-        m4.metric(
-            "추정 가속도",
-            f'{result["accel"]:.2f} m/s²',
-        )
+        m3.metric("이론적 구동력", f'{result["traction_force"]:.1f} N')
+        m4.metric("추정 가속도", f'{result["accel"]:.2f} m/s²')
 
         m5, m6 = st.columns(2)
-        m5.metric(
-            "배터리 에너지",
-            f'{result["battery_wh"]:.0f} Wh',
-        )
-        m6.metric(
-            "총 모터 출력",
-            f'{result["total_motor_power"]} W',
-        )
+        m5.metric("배터리 에너지", f'{result["battery_wh"]:.0f} Wh')
+        m6.metric("총 모터 출력", f'{result["total_motor_power"]} W')
 
     st.markdown("---")
     st.markdown(
         '<div class="section-kicker">02 / PERFORMANCE ANALYSIS</div>',
         unsafe_allow_html=True,
     )
-
     st.header("성능 분석")
 
     masses = list(range(2, 21, 2))
@@ -884,13 +717,11 @@ if page == "설계 연구소":
             params["payload"],
         )
 
-        mass_rows.append(
-            {
-                "차체 질량 (kg)": test_mass,
-                "추정 가속도 (m/s²)": test["accel"],
-                "예상 최고 속도 (km/h)": test["speed_kmh"],
-            }
-        )
+        mass_rows.append({
+            "차체 질량 (kg)": test_mass,
+            "추정 가속도 (m/s²)": test["accel"],
+            "예상 최고 속도 (km/h)": test["speed_kmh"],
+        })
 
     graph1, graph2 = st.columns(2)
 
@@ -911,7 +742,6 @@ if page == "설계 연구소":
         )
 
     st.markdown("### 설계 진단")
-
     diagnostics = []
 
     if result["net_force"] <= 0:
@@ -987,7 +817,7 @@ if page == "설계 연구소":
 
 
 # ============================================================
-# 2. 설계안 비교
+# 설계안 비교
 # ============================================================
 
 elif page == "설계안 비교":
@@ -995,7 +825,6 @@ elif page == "설계안 비교":
         '<div class="section-kicker">03 / DESIGN COMPARISON</div>',
         unsafe_allow_html=True,
     )
-
     st.header("두 설계안 비교")
     st.write("두 로봇의 조건을 조절하고 성능 차이를 비교해 보세요.")
 
@@ -1010,65 +839,61 @@ elif page == "설계안 비교":
     st.markdown("---")
     st.subheader("성능 비교 결과")
 
-    compare = pd.DataFrame(
-        {
-            "항목": [
-                "총 이동 질량 (kg)",
-                "총 모터 출력 (W)",
-                "예상 최고 속도 (km/h)",
-                "추정 가속도 (m/s²)",
-                "이론적 구동력 (N)",
-                "배터리 에너지 (Wh)",
-                "예상 작동 시간 (min)",
-                "추정 주행 가능 거리 (km)",
-            ],
-            pa["name"]: [
-                ra["total_mass"],
-                ra["total_motor_power"],
-                ra["speed_kmh"],
-                ra["accel"],
-                ra["traction_force"],
-                ra["battery_wh"],
-                ra["runtime_minutes"],
-                ra["range_km"],
-            ],
-            pb["name"]: [
-                rb["total_mass"],
-                rb["total_motor_power"],
-                rb["speed_kmh"],
-                rb["accel"],
-                rb["traction_force"],
-                rb["battery_wh"],
-                rb["runtime_minutes"],
-                rb["range_km"],
-            ],
-        }
-    )
+    compare = pd.DataFrame({
+        "항목": [
+            "총 이동 질량 (kg)",
+            "총 모터 출력 (W)",
+            "예상 최고 속도 (km/h)",
+            "추정 가속도 (m/s²)",
+            "이론적 구동력 (N)",
+            "배터리 에너지 (Wh)",
+            "예상 작동 시간 (min)",
+            "추정 주행 가능 거리 (km)",
+        ],
+        pa["name"]: [
+            ra["total_mass"],
+            ra["total_motor_power"],
+            ra["speed_kmh"],
+            ra["accel"],
+            ra["traction_force"],
+            ra["battery_wh"],
+            ra["runtime_minutes"],
+            ra["range_km"],
+        ],
+        pb["name"]: [
+            rb["total_mass"],
+            rb["total_motor_power"],
+            rb["speed_kmh"],
+            rb["accel"],
+            rb["traction_force"],
+            rb["battery_wh"],
+            rb["runtime_minutes"],
+            rb["range_km"],
+        ],
+    })
 
     st.dataframe(
         compare.set_index("항목").style.format("{:.2f}"),
         use_container_width=True,
     )
 
-    chart_df = pd.DataFrame(
-        {
-            "성능 지표": [
-                "최고 속도 (km/h)",
-                "가속도 (m/s²)",
-                "작동 시간 (min)",
-            ],
-            pa["name"]: [
-                ra["speed_kmh"],
-                ra["accel"],
-                ra["runtime_minutes"],
-            ],
-            pb["name"]: [
-                rb["speed_kmh"],
-                rb["accel"],
-                rb["runtime_minutes"],
-            ],
-        }
-    ).set_index("성능 지표")
+    chart_df = pd.DataFrame({
+        "성능 지표": [
+            "최고 속도 (km/h)",
+            "가속도 (m/s²)",
+            "작동 시간 (min)",
+        ],
+        pa["name"]: [
+            ra["speed_kmh"],
+            ra["accel"],
+            ra["runtime_minutes"],
+        ],
+        pb["name"]: [
+            rb["speed_kmh"],
+            rb["accel"],
+            rb["runtime_minutes"],
+        ],
+    }).set_index("성능 지표")
 
     st.bar_chart(chart_df)
 
@@ -1105,16 +930,18 @@ elif page == "설계안 비교":
         "실제 주행 시험 결과와 다를 수 있습니다."
     )
 
+    compare_csv = compare.to_csv(index=False).encode("utf-8-sig")
+
     st.download_button(
         "⬇ 비교 결과 CSV 다운로드",
-        data=compare.to_csv(index=False).encode("utf-8-sig"),
+        data=compare_csv,
         file_name="robo_lab_comparison.csv",
         mime="text/csv",
     )
 
 
 # ============================================================
-# 3. 공학 원리
+# 공학 원리
 # ============================================================
 
 elif page == "공학 원리":
@@ -1122,7 +949,6 @@ elif page == "공학 원리":
         '<div class="section-kicker">04 / ENGINEERING NOTES</div>',
         unsafe_allow_html=True,
     )
-
     st.header("계산에 사용한 공학 원리")
     st.write(
         "이 시뮬레이터는 기본적인 물리 관계를 이용해 "
@@ -1163,7 +989,9 @@ elif page == "공학 원리":
         )
 
     with st.expander("5. 작동 시간 근사"):
-        st.latex(r"t \approx \frac{E_{\mathrm{usable}}}{P_{\mathrm{average}}}")
+        st.latex(
+            r"t \approx \frac{E_{\mathrm{usable}}}{P_{\mathrm{average}}}"
+        )
         st.write(
             "평균 소비 전력이 커질수록 작동 시간은 짧아집니다. "
             "이 앱은 명목 배터리 에너지의 85%를 사용 가능 에너지로 "
@@ -1178,7 +1006,7 @@ elif page == "공학 원리":
 
 
 # ============================================================
-# 4. 프로젝트 정보
+# 프로젝트 정보
 # ============================================================
 
 else:
@@ -1186,7 +1014,6 @@ else:
         '<div class="section-kicker">05 / ABOUT THE PROJECT</div>',
         unsafe_allow_html=True,
     )
-
     st.header("프로젝트 정보")
 
     st.markdown(
@@ -1223,15 +1050,7 @@ else:
     )
 
 
-# ============================================================
-# 하단 푸터
-# ============================================================
-
 st.markdown(
-    """
-    <div class="footer">
-        ROBO LAB · EDUCATIONAL ROBOT DESIGN SIMULATOR · ESTIMATES ONLY
-    </div>
-    """,
+    '<div class="footer">ROBO LAB · EDUCATIONAL ROBOT DESIGN SIMULATOR · ESTIMATES ONLY</div>',
     unsafe_allow_html=True,
 )
