@@ -1,14 +1,10 @@
+
 import math
-import csv
-import io
 import streamlit as st
 import pandas as pd
 
-# 기본 페이지값을 먼저 지정하고, 사이드바 선택값으로 아래에서 갱신합니다.
-page = "설계 연구소"
-
 # ============================================================
-# ROBO LAB — Single-file Streamlit robot design simulator
+# ROBO LAB — Robot Design Studio
 # ============================================================
 
 st.set_page_config(
@@ -18,6 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+# ---------- UI / CSS ----------
 st.markdown(
     """
     <style>
@@ -87,7 +84,7 @@ st.markdown(
     }
 
     .hero-sub {
-        color: #aab9cd;
+        color: #d0dced;
         font-size: 14px;
         max-width: 760px;
         line-height: 1.7;
@@ -109,7 +106,7 @@ st.markdown(
     }
 
     .tiny-label {
-        color: #94a7c0;
+        color: #c0cee0;
         font-size: 12px;
     }
 
@@ -121,12 +118,12 @@ st.markdown(
     }
 
     .unit {
-        color: #8fa4bf;
+        color: #c0cee0;
         font-size: 12px;
     }
 
     .note {
-        color: #9aabc2;
+        color: #c0cee0;
         font-size: 12px;
         line-height: 1.65;
     }
@@ -151,11 +148,11 @@ st.markdown(
     }
 
     div[data-testid="stMetricLabel"] {
-        color: #9aabc2;
+        color: #c0cee0 !important;
     }
 
     div[data-testid="stMetricValue"] {
-        color: #eff6ff;
+        color: #eff6ff !important;
     }
 
     .stButton > button,
@@ -169,32 +166,6 @@ st.markdown(
         background: #6ba8ff;
         color: #07111e;
         border: 0;
-    }
-
-    /* CSV 다운로드 버튼 글씨 가독성 개선 */
-    [data-testid="stDownloadButton"] button {
-        background-color: #EAF2FF !important;
-        color: #102033 !important;
-        border: 1px solid #8BA6C8 !important;
-        font-weight: 800 !important;
-        opacity: 1 !important;
-    }
-
-    [data-testid="stDownloadButton"] button * {
-        color: #102033 !important;
-        fill: #102033 !important;
-        opacity: 1 !important;
-    }
-
-    [data-testid="stDownloadButton"] button:hover {
-        background-color: #65E2D1 !important;
-        color: #071820 !important;
-        border-color: #65E2D1 !important;
-    }
-
-    [data-testid="stDownloadButton"] button:hover * {
-        color: #071820 !important;
-        fill: #071820 !important;
     }
 
     hr {
@@ -213,62 +184,119 @@ st.markdown(
     }
 
     .footer {
-        color: #7387a2;
+        color: #a9bad0;
         font-size: 11px;
         text-align: center;
         padding: 24px 0 10px;
     }
 
-    /* 어두운 배경 위의 글씨 대비 개선 */
-    [data-testid="stAppViewContainer"] {
-        color: #f1f5fb;
+    /* =========================================
+       가독성 개선: 그래프 축 숫자와 라벨
+       ========================================= */
+
+    [data-testid="stChart"] text,
+    [data-testid="stVegaLiteChart"] text,
+    .stChart text {
+        fill: #24364d !important;
+        color: #24364d !important;
+        opacity: 1 !important;
+        font-weight: 700 !important;
     }
 
-    [data-testid="stWidgetLabel"] p,
-    [data-testid="stWidgetLabel"] label,
+    /* 그래프의 설명과 제목 */
     [data-testid="stMarkdownContainer"] p,
-    [data-testid="stCaptionContainer"],
-    [data-testid="stCaptionContainer"] p,
-    [data-testid="stHelp"],
-    [data-testid="stSlider"] label,
-    [data-testid="stSelectbox"] label,
-    [data-testid="stTextInput"] label,
-    [data-testid="stNumberInput"] label,
-    [data-testid="stRadio"] label,
-    [data-testid="stCheckbox"] label {
-        color: #e2eaf6 !important;
+    [data-testid="stMarkdownContainer"] li {
+        color: #f1f5fb;
+        opacity: 1;
     }
 
-    [data-testid="stExpander"] details,
-    [data-testid="stExpander"] summary,
-    [data-testid="stExpander"] summary:hover {
-        background-color: #111d2e !important;
-        color: #f1f6ff !important;
-        border-color: #354963 !important;
+    /* =========================================
+       설계 진단 메시지
+       ========================================= */
+
+    [data-testid="stAlert"] {
+        background-color: #142b46 !important;
+        border: 1px solid #42658b !important;
+        opacity: 1 !important;
     }
 
-    [data-testid="stExpander"] summary p,
-    [data-testid="stExpander"] summary span,
-    [data-testid="stExpander"] summary svg {
-        color: #f1f6ff !important;
-        fill: #f1f6ff !important;
+    [data-testid="stAlert"] p,
+    [data-testid="stAlert"] span,
+    [data-testid="stAlert"] div {
+        color: #ffffff !important;
+        opacity: 1 !important;
+        font-weight: 600 !important;
     }
 
-    [data-testid="stSlider"] [data-testid="stMarkdownContainer"] p {
-        color: #dce7f5 !important;
+    /* =========================================
+       CSV 다운로드 버튼
+       밝은 배경 + 진한 글씨
+       ========================================= */
+
+    [data-testid="stDownloadButton"] button {
+        background-color: #eaf2ff !important;
+        color: #102033 !important;
+        border: 1px solid #8ba6c8 !important;
+        font-weight: 800 !important;
+        opacity: 1 !important;
+        text-shadow: none !important;
     }
 
-    [data-testid="stMetricLabel"] *,
-    .tiny-label,
-    .unit,
-    .note {
-        color: #c0cee0 !important;
+    [data-testid="stDownloadButton"] button p,
+    [data-testid="stDownloadButton"] button span,
+    [data-testid="stDownloadButton"] button svg {
+        color: #102033 !important;
+        fill: #102033 !important;
+        -webkit-text-fill-color: #102033 !important;
+        opacity: 1 !important;
+        font-weight: 800 !important;
     }
 
+    [data-testid="stDownloadButton"] button:hover {
+        background-color: #65e2d1 !important;
+        border-color: #65e2d1 !important;
+    }
+
+    [data-testid="stDownloadButton"] button:hover p,
+    [data-testid="stDownloadButton"] button:hover span,
+    [data-testid="stDownloadButton"] button:hover svg {
+        color: #071820 !important;
+        fill: #071820 !important;
+        -webkit-text-fill-color: #071820 !important;
+    }
+
+    /* 비활성 상태로 표시되는 버튼도 글씨를 유지 */
+    [data-testid="stDownloadButton"] button:disabled {
+        background-color: #eaf2ff !important;
+        color: #102033 !important;
+        opacity: 1 !important;
+        cursor: pointer !important;
+    }
+
+    [data-testid="stDownloadButton"] button:disabled p,
+    [data-testid="stDownloadButton"] button:disabled span {
+        color: #102033 !important;
+        -webkit-text-fill-color: #102033 !important;
+        opacity: 1 !important;
+    }
+
+    /* 제목 대비 개선 */
+    h1, h2, h3 {
+        color: #ffffff !important;
+        opacity: 1 !important;
+        font-weight: 800 !important;
+    }
+
+    /* 입력 요소 */
     input,
     textarea,
     [data-baseweb="select"] > div {
         color: #101827 !important;
+    }
+
+    [data-testid="stWidgetLabel"] p,
+    [data-testid="stWidgetLabel"] label {
+        color: #e2eaf6 !important;
     }
     </style>
     """,
@@ -276,7 +304,7 @@ st.markdown(
 )
 
 
-# ---------- Physics helpers ----------
+# ---------- Physics model ----------
 def calculate_robot(
     mass,
     motor_w,
@@ -291,32 +319,53 @@ def calculate_robot(
     slope_deg,
     payload_kg,
 ):
-    """단순화한 물리 모델로 로봇 성능을 추정합니다."""
+    """단순화된 물리 모델. 결과는 실제 성능의 보증값이 아닙니다."""
 
-    total_mass = max(0.1, mass + payload_kg)
-    radius = max(0.01, wheel_radius_cm / 100.0)
-    eta = max(0.05, min(1.0, efficiency_pct / 100.0))
+    mass = max(0.1, float(mass))
+    payload_kg = max(0.0, float(payload_kg))
+    total_mass = mass + payload_kg
+
+    radius = max(0.01, float(wheel_radius_cm) / 100.0)
+    eta = max(0.05, min(1.0, float(efficiency_pct) / 100.0))
+
+    motor_w = max(0.0, float(motor_w))
+    motor_count = max(1, int(motor_count))
+    motor_rpm = max(0.0, float(motor_rpm))
+    gear_ratio = max(0.1, float(gear_ratio))
+
+    battery_v = max(0.0, float(battery_v))
+    battery_ah = max(0.0, float(battery_ah))
+    rolling_coeff = max(0.0, float(rolling_coeff))
 
     total_motor_power = motor_w * motor_count
-    wheel_rpm = motor_rpm / max(0.1, gear_ratio)
+
+    wheel_rpm = motor_rpm / gear_ratio
     omega = wheel_rpm * 2 * math.pi / 60.0
-    ideal_speed = omega * radius
+    ideal_speed = max(0.0, omega * radius)
+
     available_power = total_motor_power * eta
 
     motor_omega = motor_rpm * 2 * math.pi / 60.0
-    wheel_torque = (
-        motor_w * eta / max(motor_omega, 0.5)
-    ) * gear_ratio
 
+    if motor_omega > 0.5:
+        motor_torque = motor_w * eta / motor_omega
+    else:
+        motor_torque = 0.0
+
+    wheel_torque = motor_torque * gear_ratio
     total_torque = wheel_torque * motor_count
-    traction_force = total_torque / radius
+    traction_force = max(0.0, total_torque / radius)
 
-    theta = math.radians(slope_deg)
+    theta = math.radians(max(-90.0, min(90.0, float(slope_deg))))
     gravity = 9.81
 
     rolling_force = (
-        rolling_coeff * total_mass * gravity * math.cos(theta)
+        rolling_coeff
+        * total_mass
+        * gravity
+        * max(0.0, math.cos(theta))
     )
+
     slope_force = total_mass * gravity * math.sin(theta)
     resistance = max(0.0, rolling_force + slope_force)
 
@@ -337,7 +386,7 @@ def calculate_robot(
 
     average_power = max(
         1.0,
-        total_motor_power * 0.65 / max(0.1, eta),
+        total_motor_power * 0.65 / eta,
     )
 
     runtime_hours = usable_wh / average_power
@@ -367,8 +416,8 @@ def calculate_robot(
     }
 
 
+# ---------- Robot illustration ----------
 def robot_svg(wheel_radius_cm, mass, motor_count, color="#6ba8ff"):
-    """외부 이미지 없이 로봇 개념도를 생성합니다."""
     wheel_r = max(12, min(25, wheel_radius_cm * 1.2))
 
     return f"""
@@ -387,19 +436,29 @@ def robot_svg(wheel_radius_cm, mass, motor_count, color="#6ba8ff"):
         </linearGradient>
       </defs>
 
-      <ellipse cx="210" cy="174" rx="145" ry="24" fill="url(#floorGrad)"/>
-      <path d="M78 137 L122 104 L300 104 L345 137 L302 161 L120 161 Z"
+      <ellipse cx="210" cy="174" rx="145" ry="24"
+               fill="url(#floorGrad)"/>
+
+      <path d="M78 137 L122 104 L300 104 L345 137
+               L302 161 L120 161 Z"
             fill="#17263a" stroke="#45617f" stroke-width="2"/>
+
       <path d="M122 104 L300 104 L330 125 L100 125 Z"
             fill="#29415f" stroke="#547397" stroke-width="1.5"/>
+
       <path d="M100 125 L330 125 L302 151 L120 151 Z"
             fill="url(#bodyGrad)" stroke="#7cb5ff" stroke-width="1.5"/>
-      <path d="M155 91 L180 76 L260 76 L286 91 L270 105 L170 105 Z"
+
+      <path d="M155 91 L180 76 L260 76 L286 91
+               L270 105 L170 105 Z"
             fill="#1d3048" stroke="#6ba8ff" stroke-width="1.5"/>
+
       <rect x="187" y="63" width="46" height="17" rx="5"
             fill="#65e2d1" fill-opacity=".85"/>
+
       <circle cx="210" cy="61" r="7"
               fill="#65e2d1" stroke="#b7fff4" stroke-width="2"/>
+
       <path d="M210 52 V39 M202 44 L210 36 L218 44"
             stroke="#65e2d1" stroke-width="2"
             fill="none" stroke-linecap="round"/>
@@ -436,6 +495,7 @@ def robot_svg(wheel_radius_cm, mass, motor_count, color="#6ba8ff"):
     """
 
 
+# ---------- Design controls ----------
 def make_design(prefix, defaults):
     st.markdown(f"### {prefix} · {defaults['name']}")
 
@@ -577,6 +637,8 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+
+# ---------- Sidebar ----------
 with st.sidebar:
     st.markdown("## 🤖 ROBO LAB")
     st.caption("ROBOT DESIGN STUDIO")
@@ -584,7 +646,13 @@ with st.sidebar:
 
     page = st.radio(
         "WORKSPACE",
-        ["설계 연구소", "설계안 비교", "공학 원리", "프로젝트 정보"],
+        [
+            "설계 연구소",
+            "설계안 비교",
+            "공학 원리",
+            "사용 설명서",
+            "프로젝트 정보",
+        ],
         index=0,
     )
 
@@ -603,10 +671,17 @@ with st.sidebar:
     )
 
     st.markdown(
-        '<p class="note">모든 결과는 단순화한 이론 모델에 따른 추정값입니다. 실제 제작 전에는 부품 사양과 안전 한계를 확인해야 합니다.</p>',
+        """
+        <p class="note">
+        모든 결과는 단순화한 이론 모델에 따른 추정값입니다.
+        실제 제작 전에는 부품 사양과 안전 한계를 확인해야 합니다.
+        </p>
+        """,
         unsafe_allow_html=True,
     )
 
+
+# ---------- Default designs ----------
 defaults_a = {
     "name": "Explorer A",
     "mass": 8.0,
@@ -641,9 +716,8 @@ defaults_b = {
 
 
 # ============================================================
-# 설계 연구소
+# 01 — 설계 연구소
 # ============================================================
-
 if page == "설계 연구소":
     st.markdown(
         '<div class="section-kicker">01 / CONFIGURATION</div>',
@@ -671,7 +745,9 @@ if page == "설계 연구소":
             ),
             unsafe_allow_html=True,
         )
-        st.caption("개념도: 실제 크기·부품 배치·CAD 형상을 나타내지 않습니다.")
+        st.caption(
+            "개념도: 실제 크기·부품 배치·CAD 형상을 나타내지 않습니다."
+        )
 
     with right:
         st.markdown(
@@ -680,16 +756,34 @@ if page == "설계 연구소":
         )
 
         m1, m2 = st.columns(2)
-        m1.metric("예상 최고 속도", f'{result["speed_kmh"]:.1f} km/h')
-        m2.metric("예상 작동 시간", f'{result["runtime_minutes"]:.0f} min')
+        m1.metric(
+            "예상 최고 속도",
+            f'{result["speed_kmh"]:.1f} km/h',
+        )
+        m2.metric(
+            "예상 작동 시간",
+            f'{result["runtime_minutes"]:.0f} min',
+        )
 
         m3, m4 = st.columns(2)
-        m3.metric("이론적 구동력", f'{result["traction_force"]:.1f} N')
-        m4.metric("추정 가속도", f'{result["accel"]:.2f} m/s²')
+        m3.metric(
+            "이론적 구동력",
+            f'{result["traction_force"]:.1f} N',
+        )
+        m4.metric(
+            "추정 가속도",
+            f'{result["accel"]:.2f} m/s²',
+        )
 
         m5, m6 = st.columns(2)
-        m5.metric("배터리 에너지", f'{result["battery_wh"]:.0f} Wh')
-        m6.metric("총 모터 출력", f'{result["total_motor_power"]} W')
+        m5.metric(
+            "배터리 에너지",
+            f'{result["battery_wh"]:.0f} Wh',
+        )
+        m6.metric(
+            "총 모터 출력",
+            f'{result["total_motor_power"]} W',
+        )
 
     st.markdown("---")
     st.markdown(
@@ -742,6 +836,7 @@ if page == "설계 연구소":
         )
 
     st.markdown("### 설계 진단")
+
     diagnostics = []
 
     if result["net_force"] <= 0:
@@ -817,9 +912,8 @@ if page == "설계 연구소":
 
 
 # ============================================================
-# 설계안 비교
+# 02 — 설계안 비교
 # ============================================================
-
 elif page == "설계안 비교":
     st.markdown(
         '<div class="section-kicker">03 / DESIGN COMPARISON</div>',
@@ -839,6 +933,13 @@ elif page == "설계안 비교":
     st.markdown("---")
     st.subheader("성능 비교 결과")
 
+    name_a = pa["name"].strip() or "설계 A"
+    name_b = pb["name"].strip() or "설계 B"
+
+    if name_a == name_b:
+        name_a = f"{name_a} (A)"
+        name_b = f"{name_b} (B)"
+
     compare = pd.DataFrame({
         "항목": [
             "총 이동 질량 (kg)",
@@ -850,7 +951,7 @@ elif page == "설계안 비교":
             "예상 작동 시간 (min)",
             "추정 주행 가능 거리 (km)",
         ],
-        pa["name"]: [
+        name_a: [
             ra["total_mass"],
             ra["total_motor_power"],
             ra["speed_kmh"],
@@ -860,7 +961,7 @@ elif page == "설계안 비교":
             ra["runtime_minutes"],
             ra["range_km"],
         ],
-        pb["name"]: [
+        name_b: [
             rb["total_mass"],
             rb["total_motor_power"],
             rb["speed_kmh"],
@@ -883,12 +984,12 @@ elif page == "설계안 비교":
             "가속도 (m/s²)",
             "작동 시간 (min)",
         ],
-        pa["name"]: [
+        name_a: [
             ra["speed_kmh"],
             ra["accel"],
             ra["runtime_minutes"],
         ],
-        pb["name"]: [
+        name_b: [
             rb["speed_kmh"],
             rb["accel"],
             rb["runtime_minutes"],
@@ -900,18 +1001,14 @@ elif page == "설계안 비교":
     st.markdown("### 비교 분석")
 
     speed_winner = (
-        pa["name"]
-        if ra["speed_kmh"] > rb["speed_kmh"]
-        else pb["name"]
-        if rb["speed_kmh"] > ra["speed_kmh"]
+        name_a if ra["speed_kmh"] > rb["speed_kmh"]
+        else name_b if rb["speed_kmh"] > ra["speed_kmh"]
         else "두 설계안이 동일"
     )
 
     runtime_winner = (
-        pa["name"]
-        if ra["runtime_minutes"] > rb["runtime_minutes"]
-        else pb["name"]
-        if rb["runtime_minutes"] > ra["runtime_minutes"]
+        name_a if ra["runtime_minutes"] > rb["runtime_minutes"]
+        else name_b if rb["runtime_minutes"] > ra["runtime_minutes"]
         else "두 설계안이 동일"
     )
 
@@ -941,9 +1038,8 @@ elif page == "설계안 비교":
 
 
 # ============================================================
-# 공학 원리
+# 03 — 공학 원리
 # ============================================================
-
 elif page == "공학 원리":
     st.markdown(
         '<div class="section-kicker">04 / ENGINEERING NOTES</div>',
@@ -1006,12 +1102,65 @@ elif page == "공학 원리":
 
 
 # ============================================================
-# 프로젝트 정보
+# 04 — 사용 설명서
 # ============================================================
+elif page == "사용 설명서":
+    st.markdown(
+        '<div class="section-kicker">05 / QUICK START</div>',
+        unsafe_allow_html=True,
+    )
+    st.header("ROBO LAB 사용 설명서")
+    st.write("처음 사용하는 경우 아래 순서대로 진행하세요.")
 
+    with st.expander("1. 로봇 사양 조절하기", expanded=True):
+        st.markdown(
+            """
+            - **설계 연구소**로 이동합니다.
+            - **A 설계 사양 조정**을 펼칩니다.
+            - 차체·적재 질량, 모터 출력과 회전수, 감속비,
+              바퀴 반지름, 배터리 조건을 조절합니다.
+            - 오른쪽 결과와 아래 그래프가 바뀌는지 확인합니다.
+            """
+        )
+
+    with st.expander("2. 결과 읽는 법"):
+        st.markdown(
+            """
+            - **예상 최고 속도:** 모터 회전수·감속비·바퀴 반지름과
+              단순화한 저항 모델로 계산한 값입니다.
+            - **이론적 구동력:** 모터 출력에서 추정한 토크를
+              바퀴 반지름으로 나눈 값입니다.
+            - **추정 가속도:** 모델에서 구한 알짜힘을
+              총 이동 질량으로 나눈 값입니다.
+            - **예상 작동 시간:** 배터리 에너지와 가정한
+              평균 소비 전력으로 계산합니다.
+            - **CSV 보고서:** 스프레드시트 프로그램에서 열어
+              기록하거나 그래프를 만들 수 있습니다.
+            """
+        )
+
+    with st.expander("3. 두 설계안 비교하기"):
+        st.markdown(
+            "설계안 비교 메뉴에서 A와 B의 사양을 각각 조절하세요. "
+            "두 설계의 속도·가속도·작동 시간과 CSV 비교표를 "
+            "확인할 수 있습니다."
+        )
+
+    with st.expander("4. 알아둘 한계"):
+        st.warning(
+            "이 앱은 교육용 근사 모델입니다. 실제 모터의 토크-회전수 "
+            "곡선, 배터리 방전 특성, 접지력, 제동, 구조 강도, 발열 및 "
+            "제어 방식은 완전히 반영하지 않습니다. 실제 제작 전에는 "
+            "부품 데이터시트와 안전 조건을 별도로 검토하세요."
+        )
+
+
+# ============================================================
+# 05 — 프로젝트 정보
+# ============================================================
 else:
     st.markdown(
-        '<div class="section-kicker">05 / ABOUT THE PROJECT</div>',
+        '<div class="section-kicker">06 / ABOUT THE PROJECT</div>',
         unsafe_allow_html=True,
     )
     st.header("프로젝트 정보")
@@ -1043,69 +1192,20 @@ else:
         2. GitHub 저장소에 업로드합니다.
         3. Streamlit Community Cloud에서 저장소와 `main.py`를 선택해 배포합니다.
 
-        이 앱은 외부 이미지나 API 없이 계산과 시각화 기능이 작동합니다.
-        CSS의 웹 폰트는 인터넷 연결이 가능할 때만 적용되며,
-        연결이 없으면 기본 글꼴로 표시됩니다.
+        이 앱은 인터넷에서 이미지나 외부 API를 불러오지 않아도
+        계산과 시각화 기능이 작동합니다. 다만 CSS의 웹 폰트는
+        인터넷 연결이 가능할 때만 적용되며, 연결이 없으면 기본
+        글꼴로 표시됩니다.
         """
     )
 
 
+# ---------- Footer ----------
 st.markdown(
-    '<div class="footer">ROBO LAB · EDUCATIONAL ROBOT DESIGN SIMULATOR · ESTIMATES ONLY</div>',
+    """
+    <div class="footer">
+        ROBO LAB · EDUCATIONAL ROBOT DESIGN SIMULATOR · ESTIMATES ONLY
+    </div>
+    """,
     unsafe_allow_html=True,
 )
-/* 그래프 축 숫자와 라벨을 선명하게 */
-[data-testid="stChart"] text,
-[data-testid="stVegaLiteChart"] text,
-.stChart text {
-    fill: #24364d !important;
-    color: #24364d !important;
-    opacity: 1 !important;
-    font-weight: 700 !important;
-}
-
-/* 그래프 주변 설명 글씨 */
-[data-testid="stMarkdownContainer"] p,
-[data-testid="stMarkdownContainer"] li {
-    color: #f1f5fb !important;
-    opacity: 1 !important;
-}
-
-/* 설계 진단 안내 상자 */
-[data-testid="stAlert"] {
-    background-color: #142b46 !important;
-    border: 1px solid #42658b !important;
-    opacity: 1 !important;
-}
-
-[data-testid="stAlert"] p,
-[data-testid="stAlert"] span,
-[data-testid="stAlert"] div {
-    color: #ffffff !important;
-    opacity: 1 !important;
-    font-weight: 600 !important;
-}
-
-/* CSV 다운로드 버튼: 비활성화처럼 흐리게 보이는 현상 방지 */
-[data-testid="stDownloadButton"] button,
-[data-testid="stDownloadButton"] button p,
-[data-testid="stDownloadButton"] button span {
-    background-color: #eaf2ff !important;
-    color: #102033 !important;
-    -webkit-text-fill-color: #102033 !important;
-    font-weight: 800 !important;
-    opacity: 1 !important;
-    text-shadow: none !important;
-}
-
-[data-testid="stDownloadButton"] button:hover {
-    background-color: #65e2d1 !important;
-    border-color: #65e2d1 !important;
-}
-
-[data-testid="stDownloadButton"] button:hover p,
-[data-testid="stDownloadButton"] button:hover span {
-    color: #071820 !important;
-    -webkit-text-fill-color: #071820 !important;
-}
-
