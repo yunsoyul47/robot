@@ -112,7 +112,7 @@ div[data-testid="stMetricValue"] {
     color: #ffffff !important;
 }
 
-/* 위젯 라벨 스타일 (설계 목표 등) */
+/* 위젯 라벨 (설계 목표 등) */
 [data-testid="stWidgetLabel"] p,
 [data-testid="stWidgetLabel"] label {
     color: #65e2d1 !important;
@@ -174,40 +174,51 @@ div[data-testid="stMetricValue"] {
 }
 
 /* ---------------------------------------------------------
-   선택창 (Selectbox) 민트색 보정 스타일
+   선택창 (Selectbox) 및 드래그 영역 민트색 강화 CSS
 --------------------------------------------------------- */
 
-/* Selectbox 외곽 상자 */
-div[data-baseweb="select"] > div {
+/* 선택창 최외각 컨테이너 */
+div[data-baseweb="select"] {
     background-color: #162b47 !important;
-    border: 1px solid #65e2d1 !important;
-    color: #65e2d1 !important;
     border-radius: 8px !important;
 }
 
-/* Selectbox 선택된 글씨 (민트색 & 진하게) */
-div[data-baseweb="select"] span,
-div[data-baseweb="select"] div {
+/* 선택창 내부 입력영역 전체 */
+div[data-baseweb="select"] > div {
+    background-color: #162b47 !important;
+    border: 1.5px solid #65e2d1 !important;
+    border-radius: 8px !important;
+}
+
+/* 선택창 텍스트 (범용 이동 로봇 등) - 강제 민트색 및 흰색 배경 제거 */
+div[data-baseweb="select"] * {
+    background-color: transparent !important;
     color: #65e2d1 !important;
+    -webkit-text-fill-color: #65e2d1 !important;
     font-weight: 700 !important;
 }
 
-/* Selectbox 드롭다운 화살표 */
+/* 드래그/선택 하이라이트 영역 민트색 커스텀 */
+div[data-baseweb="select"] *::selection {
+    background-color: #102e30 !important;
+    color: #65e2d1 !important;
+}
+
+/* 드롭다운 아이콘 (화살표) */
 div[data-baseweb="select"] svg {
     fill: #65e2d1 !important;
     color: #65e2d1 !important;
 }
 
-/* 드롭다운 클릭 시 열리는 옵션 메뉴 팝업 */
+/* 클릭 시 열리는 옵션 메뉴 팝업 */
 ul[data-baseweb="menu"] {
     background-color: #101c2e !important;
-    border: 1px solid #293b53 !important;
+    border: 1px solid #65e2d1 !important;
 }
 
-ul[data-baseweb="menu"] li,
-ul[data-baseweb="menu"] li div,
-ul[data-baseweb="menu"] li span {
+ul[data-baseweb="menu"] * {
     color: #65e2d1 !important;
+    -webkit-text-fill-color: #65e2d1 !important;
     font-weight: 600 !important;
 }
 
