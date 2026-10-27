@@ -112,16 +112,24 @@ div[data-testid="stMetricValue"] {
     color: #ffffff !important;
 }
 
+/* 위젯 일반 라벨 스타일 조정 (설계 목표 등) */
 [data-testid="stWidgetLabel"] p,
 [data-testid="stWidgetLabel"] label {
-    color: #e2eaf6 !important;
-    font-weight: 600 !important;
+    color: #65e2d1 !important;
+    font-weight: 700 !important;
 }
 
 [data-testid="stMarkdownContainer"] p,
 [data-testid="stMarkdownContainer"] li {
     color: #e7eef9;
     opacity: 1;
+}
+
+/* 사이드바 Markdown 텍스트 보정 (설계 목표 제목) */
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] strong,
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] b {
+    color: #65e2d1 !important;
+    font-size: 16px !important;
 }
 
 [data-testid="stAlert"] {
