@@ -115,6 +115,7 @@ div[data-testid="stMetricValue"] {
 [data-testid="stWidgetLabel"] p,
 [data-testid="stWidgetLabel"] label {
     color: #e2eaf6 !important;
+    font-weight: 600 !important;
 }
 
 [data-testid="stMarkdownContainer"] p,
@@ -164,20 +165,55 @@ div[data-testid="stMetricValue"] {
     background: #65e2d1 !important;
 }
 
-/* Selectbox 스타일 수정 (드롭다운 배경 dark화 및 텍스트 흰색 가독성 확보) */
+/* ---------------------------------------------------------
+   흐린 글씨 & 흰색 배경 커스텀 보정 (가독성 강화)
+--------------------------------------------------------- */
+
+/* 1. Selectbox (드롭다운) 스타일 */
 div[data-baseweb="select"] > div {
     background-color: #162b47 !important;
-    border: 1px solid #293b53 !important;
+    border: 1px solid #365378 !important;
     color: #ffffff !important;
+    border-radius: 8px !important;
 }
 
 div[data-baseweb="select"] span {
     color: #ffffff !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
 }
 
 div[data-baseweb="select"] svg {
-    fill: #ffffff !important;
+    fill: #65e2d1 !important;
+}
+
+/* 2. Text Input (텍스트 입력창) 스타일 */
+div[data-testid="stTextInput"] input {
+    background-color: #162b47 !important;
+    color: #ffffff !important;
+    border: 1px solid #365378 !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+}
+
+/* 3. Expander (설계 사양 조정 접기/펴기) 스타일 */
+div[data-testid="stExpander"] {
+    background-color: #101c2e !important;
+    border: 1px solid #293b53 !important;
+    border-radius: 12px !important;
+}
+
+div[data-testid="stExpander"] summary {
+    background-color: #162a42 !important;
+    color: #65e2d1 !important;
+    border-radius: 10px !important;
+}
+
+div[data-testid="stExpander"] summary p,
+div[data-testid="stExpander"] summary span,
+div[data-testid="stExpander"] summary svg {
+    color: #65e2d1 !important;
+    fill: #65e2d1 !important;
+    font-weight: 700 !important;
 }
 
 hr {
