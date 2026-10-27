@@ -5,7 +5,7 @@ import streamlit.components.v1 as components
 import pandas as pd
 
 # =========================================================
-# ROBO LAB
+# ROBO LAB | Robot Design Studio
 # =========================================================
 
 st.set_page_config(
@@ -250,7 +250,6 @@ def calculate_robot(
     battery_wh = float(battery_v) * float(battery_ah)
     usable_wh = battery_wh * 0.85
 
-    # 단순화한 평균 소비 전력 가정
     average_power = max(1, total_power * 0.65 / eta)
 
     runtime_hours = usable_wh / average_power
@@ -277,114 +276,316 @@ def calculate_robot(
 
 
 # ---------------------------------------------------------
-# ROBOT PREVIEW
-# SVG를 Markdown이 아닌 HTML 컴포넌트로 직접 렌더링
+# ANIMATED ROBOT PREVIEW
+# 속도 -> 바퀴 회전 및 차체 이동 속도
+# 가속도 -> 출발 애니메이션의 가속 느낌
 # ---------------------------------------------------------
 
-def robot_svg(wheel_radius_cm, mass, motor_count):
+def robot_svg(wheel_radius_cm, mass, motor_count, speed_kmh, acceleration):
     wheel_r = max(12, min(25, wheel_radius_cm * 1.2))
+
+    speed = max(0.0, float(speed_kmh))
+    accel = max(0.0, float(acceleration))
+
+    # 빠를수록 애니메이션 주기가 짧아짐
+    # 정지 상태에서는 바퀴 회전과 이동 애니메이션을 중지
+    if speed < 0.05:
+        drive_duration = 0
+        wheel_duration = 0
+        drive_style = "none"
+        wheel_style = "none"
+        movement_label = "STATIONARY"
+    else:
+        drive_duration = max(1.2, min(8.0, 8.0 / max(0.5, speed / 2)))
+        wheel_duration = max(0.18, min(2.0, 5.0 / max(1.0, speed)))
+        drive_style = f"drive {drive_duration:.2f}s ease-in-out infinite"
+        wheel_style = f"spin {wheel_duration:.2f}s linear infinite"
+        movement_label = "MOVING"
+
+    # 가속도가 클수록 출발 시 차체의 움직임이 더 빠르게 붙는 효과
+    accel_factor = min(1.0, accel / 5.0)
+    ease_x1 = 0.05 + 0.25 * accel_factor
+    ease_x2 = 0.55 + 0.40 * accel_factor
+    easing = f"cubic-bezier({ease_x1:.2f}, 0.10, {ease_x2:.2f}, 1)"
+
+    if speed >= 0.05:
+        drive_style = f"drive {drive_duration:.2f}s {easing} infinite"
+
+    # 가속도에 따라 센서 빛의 맥박도 조금 달라짐
+    pulse_duration = max(0.35, 1.8 - min(accel, 5.0) * 0.22)
 
     return f"""
     <!DOCTYPE html>
     <html>
     <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <style>
+        * {{
+            box-sizing: border-box;
+        }}
+
         html, body {{
             margin: 0;
             padding: 0;
             background: transparent;
             overflow: hidden;
+            font-family: Arial, sans-serif;
         }}
+
         .wrap {{
-            box-sizing: border-box;
             width: 100%;
-            min-height: 245px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            min-height: 255px;
+            overflow: hidden;
             border: 1px solid #293b53;
             border-radius: 18px;
-            background: linear-gradient(145deg, #101c2d, #0b1320);
-            padding: 10px;
+            background:
+                radial-gradient(ellipse at 50% 75%, #1c3550 0%, transparent 65%),
+                linear-gradient(145deg, #101c2d, #0b1320);
+            padding: 8px 10px 10px;
         }}
+
+        .topline {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            font-family: monospace;
+            font-size: 10px;
+            letter-spacing: 1.3px;
+            color: #65e2d1;
+            padding: 3px 5px 0;
+        }}
+
+        .status {{
+            color: #e8f2ff;
+            background: #152b40;
+            border: 1px solid #365775;
+            border-radius: 999px;
+            padding: 4px 8px;
+            font-size: 9px;
+            white-space: nowrap;
+        }}
+
         svg {{
             display: block;
             width: 100%;
-            max-width: 480px;
             height: auto;
+            max-height: 205px;
+        }}
+
+        #robot {{
+            transform-box: view-box;
+            transform-origin: center;
+            animation: {drive_style};
+        }}
+
+        .wheel {{
+            transform-box: fill-box;
+            transform-origin: center;
+            animation: {wheel_style};
+        }}
+
+        .sensor {{
+            animation: sensorPulse {pulse_duration:.2f}s ease-in-out infinite alternate;
+        }}
+
+        .floorGlow {{
+            animation: floorPulse 2.5s ease-in-out infinite alternate;
+        }}
+
+        @keyframes drive {{
+            0%   {{ transform: translateX(-17px) translateY(0px); }}
+            25%  {{ transform: translateX(-7px) translateY(-1px); }}
+            50%  {{ transform: translateX(17px) translateY(0px); }}
+            75%  {{ transform: translateX(7px) translateY(-1px); }}
+            100% {{ transform: translateX(-17px) translateY(0px); }}
+        }}
+
+        @keyframes spin {{
+            from {{ transform: rotate(0deg); }}
+            to   {{ transform: rotate(360deg); }}
+        }}
+
+        @keyframes sensorPulse {{
+            from {{ opacity: .55; }}
+            to   {{ opacity: 1; }}
+        }}
+
+        @keyframes floorPulse {{
+            from {{ opacity: .35; }}
+            to   {{ opacity: .75; }}
+        }}
+
+        @media (prefers-reduced-motion: reduce) {{
+            #robot, .wheel, .sensor, .floorGlow {{
+                animation: none !important;
+            }}
         }}
     </style>
     </head>
+
     <body>
     <div class="wrap">
-    <svg viewBox="0 0 420 230"
-         xmlns="http://www.w3.org/2000/svg"
-         role="img" aria-label="로봇 차체 개념도">
-      <defs>
-        <linearGradient id="bodyGrad" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="#6ba8ff"/>
-          <stop offset="100%" stop-color="#244c7a"/>
-        </linearGradient>
-        <linearGradient id="floorGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#263c58" stop-opacity=".8"/>
-          <stop offset="100%" stop-color="#0b1421" stop-opacity="0"/>
-        </linearGradient>
-      </defs>
+      <div class="topline">
+        <span>DESIGN PREVIEW / LIVE MODEL</span>
+        <span class="status">{movement_label}</span>
+      </div>
 
-      <ellipse cx="210" cy="176" rx="145" ry="24"
-               fill="url(#floorGrad)"/>
+      <svg viewBox="0 0 420 230"
+           xmlns="http://www.w3.org/2000/svg"
+           role="img"
+           aria-label="속도와 가속도에 반응하는 로봇 개념도">
 
-      <path d="M78 137 L122 104 L300 104 L345 137
-               L302 161 L120 161 Z"
-            fill="#17263a" stroke="#45617f" stroke-width="2"/>
+        <defs>
+          <linearGradient id="bodyGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#6ba8ff"/>
+            <stop offset="100%" stop-color="#244c7a"/>
+          </linearGradient>
 
-      <path d="M122 104 L300 104 L330 125 L100 125 Z"
-            fill="#29415f" stroke="#547397" stroke-width="1.5"/>
+          <linearGradient id="floorGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#263c58" stop-opacity=".8"/>
+            <stop offset="100%" stop-color="#0b1421" stop-opacity="0"/>
+          </linearGradient>
 
-      <path d="M100 125 L330 125 L302 151 L120 151 Z"
-            fill="url(#bodyGrad)" stroke="#7cb5ff" stroke-width="1.5"/>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="4" result="blur"/>
+            <feMerge>
+              <feMergeNode in="blur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
 
-      <path d="M155 91 L180 76 L260 76 L286 91
-               L270 105 L170 105 Z"
-            fill="#1d3048" stroke="#6ba8ff" stroke-width="1.5"/>
+        <ellipse class="floorGlow"
+                 cx="210" cy="177" rx="148" ry="25"
+                 fill="url(#floorGrad)"/>
 
-      <rect x="187" y="63" width="46" height="17" rx="5"
-            fill="#65e2d1"/>
+        <g id="robot">
 
-      <circle cx="210" cy="61" r="7"
-              fill="#65e2d1" stroke="#b7fff4" stroke-width="2"/>
+          <!-- Chassis -->
+          <path d="M78 137 L122 104 L300 104 L345 137
+                   L302 161 L120 161 Z"
+                fill="#17263a"
+                stroke="#45617f"
+                stroke-width="2"/>
 
-      <path d="M210 52 V39 M202 44 L210 36 L218 44"
-            stroke="#65e2d1" stroke-width="2"
-            fill="none" stroke-linecap="round"/>
+          <path d="M122 104 L300 104 L330 125 L100 125 Z"
+                fill="#29415f"
+                stroke="#547397"
+                stroke-width="1.5"/>
 
-      <circle cx="124" cy="155" r="{wheel_r+4}"
-              fill="#050a11" stroke="#52657d" stroke-width="2"/>
-      <circle cx="124" cy="155" r="{wheel_r-3}"
-              fill="#1b2b40" stroke="#7d94b1" stroke-width="2"/>
-      <circle cx="124" cy="155" r="5" fill="#65e2d1"/>
+          <path d="M100 125 L330 125 L302 151 L120 151 Z"
+                fill="url(#bodyGrad)"
+                stroke="#7cb5ff"
+                stroke-width="1.5"/>
 
-      <circle cx="296" cy="155" r="{wheel_r+4}"
-              fill="#050a11" stroke="#52657d" stroke-width="2"/>
-      <circle cx="296" cy="155" r="{wheel_r-3}"
-              fill="#1b2b40" stroke="#7d94b1" stroke-width="2"/>
-      <circle cx="296" cy="155" r="5" fill="#65e2d1"/>
+          <!-- Top panel -->
+          <path d="M155 91 L180 76 L260 76 L286 91
+                   L270 105 L170 105 Z"
+                fill="#1d3048"
+                stroke="#6ba8ff"
+                stroke-width="1.5"/>
 
-      <path d="M148 131 H282"
-            stroke="#b6d4ff" stroke-opacity=".65"
-            stroke-width="2" stroke-dasharray="5 5"/>
+          <!-- Battery indicator -->
+          <rect x="188" y="84" width="44" height="12" rx="3"
+                fill="#101a28" stroke="#91b8e8" stroke-width="1"/>
 
-      <text x="210" y="198" text-anchor="middle"
-            fill="#c8d8ec" font-family="monospace" font-size="11">
-        CONCEPT MODEL · {mass:.1f} kg · {motor_count} MOTOR(S)
-      </text>
+          <rect x="192" y="87" width="27" height="6" rx="2"
+                fill="#65e2d1"/>
 
-      <text x="210" y="216" text-anchor="middle"
-            fill="#9fb4ce" font-family="monospace" font-size="9">
-        ILLUSTRATIVE DESIGN · NOT A CAD MODEL
-      </text>
-    </svg>
+          <!-- Sensor -->
+          <g class="sensor" filter="url(#glow)">
+            <rect x="187" y="63" width="46" height="17" rx="5"
+                  fill="#65e2d1"/>
+            <circle cx="210" cy="61" r="7"
+                    fill="#65e2d1"
+                    stroke="#b7fff4"
+                    stroke-width="2"/>
+          </g>
+
+          <!-- Sensor rays -->
+          <g stroke="#65e2d1" stroke-width="1.5"
+             stroke-linecap="round" opacity=".8">
+            <path d="M210 51 V42"/>
+            <path d="M201 46 L196 41"/>
+            <path d="M219 46 L224 41"/>
+          </g>
+
+          <!-- Left wheel -->
+          <g class="wheel">
+            <circle cx="124" cy="155" r="{wheel_r+4}"
+                    fill="#050a11"
+                    stroke="#52657d"
+                    stroke-width="2"/>
+            <circle cx="124" cy="155" r="{wheel_r-3}"
+                    fill="#1b2b40"
+                    stroke="#7d94b1"
+                    stroke-width="2"/>
+
+            <g stroke="#9db6d5" stroke-width="2">
+              <path d="M124 {155-wheel_r+3} V{155+wheel_r-3}"/>
+              <path d="M{124-wheel_r+3} 155 H{124+wheel_r-3}"/>
+              <path d="M{124-wheel_r*.65:.1f} {155-wheel_r*.65:.1f}
+                       L{124+wheel_r*.65:.1f} {155+wheel_r*.65:.1f}"/>
+              <path d="M{124-wheel_r*.65:.1f} {155+wheel_r*.65:.1f}
+                       L{124+wheel_r*.65:.1f} {155-wheel_r*.65:.1f}"/>
+            </g>
+
+            <circle cx="124" cy="155" r="5" fill="#65e2d1"/>
+          </g>
+
+          <!-- Right wheel -->
+          <g class="wheel">
+            <circle cx="296" cy="155" r="{wheel_r+4}"
+                    fill="#050a11"
+                    stroke="#52657d"
+                    stroke-width="2"/>
+            <circle cx="296" cy="155" r="{wheel_r-3}"
+                    fill="#1b2b40"
+                    stroke="#7d94b1"
+                    stroke-width="2"/>
+
+            <g stroke="#9db6d5" stroke-width="2">
+              <path d="M296 {155-wheel_r+3} V{155+wheel_r-3}"/>
+              <path d="M{296-wheel_r+3} 155 H{296+wheel_r-3}"/>
+              <path d="M{296-wheel_r*.65:.1f} {155-wheel_r*.65:.1f}
+                       L{296+wheel_r*.65:.1f} {155+wheel_r*.65:.1f}"/>
+              <path d="M{296-wheel_r*.65:.1f} {155+wheel_r*.65:.1f}
+                       L{296+wheel_r*.65:.1f} {155-wheel_r*.65:.1f}"/>
+            </g>
+
+            <circle cx="296" cy="155" r="5" fill="#65e2d1"/>
+          </g>
+
+          <!-- Chassis detail -->
+          <path d="M148 131 H282"
+                stroke="#b6d4ff"
+                stroke-opacity=".65"
+                stroke-width="2"
+                stroke-dasharray="5 5"/>
+
+          <circle cx="160" cy="141" r="3" fill="#65e2d1"/>
+          <circle cx="270" cy="141" r="3" fill="#65e2d1"/>
+
+        </g>
+
+        <text x="210" y="204" text-anchor="middle"
+              fill="#d5e4f6"
+              font-family="monospace"
+              font-size="11">
+          SPEED {speed:.1f} km/h
+        </text>
+
+        <text x="210" y="220" text-anchor="middle"
+              fill="#9fb4ce"
+              font-family="monospace"
+              font-size="10">
+          ACCELERATION {accel:.2f} m/s²
+        </text>
+
+      </svg>
     </div>
     </body>
     </html>
@@ -506,6 +707,10 @@ def make_design(prefix, defaults):
     return params, result
 
 
+# ---------------------------------------------------------
+# REPORT / CSV
+# ---------------------------------------------------------
+
 def make_report(params, result):
     rows = [
         ["설계 이름", params["name"], ""],
@@ -527,12 +732,13 @@ def make_report(params, result):
         ["예상 작동 시간", result["runtime_minutes"], "min"],
         ["추정 주행 가능 거리", result["range_km"], "km"],
     ]
+
     return pd.DataFrame(rows, columns=["항목", "값", "단위"])
 
 
 def csv_download(df, label, filename):
-    # utf-8-sig를 사용해 Excel에서 한글이 깨지는 현상을 줄임
     data = df.to_csv(index=False).encode("utf-8-sig")
+
     st.download_button(
         label,
         data=data,
@@ -662,19 +868,22 @@ if page == "설계 연구소":
             unsafe_allow_html=True,
         )
 
-        # 중요: SVG를 Markdown으로 출력하지 않고 HTML 컴포넌트로 표시
+        # 속도와 가속도 계산 결과를 프리뷰 애니메이션에 전달
         components.html(
             robot_svg(
                 params["wheel_radius"],
                 result["total_mass"],
                 params["motor_count"],
+                result["speed_kmh"],
+                result["acceleration"],
             ),
-            height=265,
+            height=280,
             scrolling=False,
         )
 
         st.caption(
-            "개념도: 실제 크기·부품 배치·CAD 형상을 나타내지 않습니다."
+            "개념도: 애니메이션은 계산된 속도와 가속도를 시각화한 것으로, "
+            "실제 주행 성능을 그대로 재현하지는 않습니다."
         )
 
     with right:
@@ -957,6 +1166,7 @@ elif page == "사용 설명서":
         - 차체·적재 질량, 모터 출력과 회전수, 감속비, 바퀴 반지름,
           배터리 조건을 조절합니다.
         - 오른쪽 성능 지표와 아래 그래프를 확인합니다.
+        - 프리뷰 애니메이션은 계산된 속도와 가속도에 따라 달라집니다.
         """)
 
     with st.expander("2. 결과 읽는 법"):
@@ -1004,7 +1214,7 @@ else:
     - **Python** — 계산 로직
     - **Streamlit** — 웹 UI와 상호작용
     - **Pandas** — 표와 CSV 보고서
-    - **SVG / CSS** — 로봇 개념도와 디자인
+    - **SVG / CSS** — 로봇 개념도와 애니메이션
 
     ### 탐구 질문
 
