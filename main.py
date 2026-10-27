@@ -277,8 +277,8 @@ def calculate_robot(
 
 # ---------------------------------------------------------
 # ANIMATED ROBOT PREVIEW
-# 속도 -> 바퀴 회전 및 차체 이동 속도
-# 가속도 -> 출발 애니메이션의 가속 느낌
+# 속도에 따라 좌우 왕복 속도와 바퀴 회전 속도 조절
+# 버튼으로 일시 정지 / 재생
 # ---------------------------------------------------------
 
 def robot_svg(wheel_radius_cm, mass, motor_count, speed_kmh, acceleration):
@@ -287,8 +287,6 @@ def robot_svg(wheel_radius_cm, mass, motor_count, speed_kmh, acceleration):
     speed = max(0.0, float(speed_kmh))
     accel = max(0.0, float(acceleration))
 
-    # 빠를수록 애니메이션 주기가 짧아짐
-    # 정지 상태에서는 바퀴 회전과 이동 애니메이션을 중지
     if speed < 0.05:
         drive_duration = 0
         wheel_duration = 0
@@ -296,13 +294,14 @@ def robot_svg(wheel_radius_cm, mass, motor_count, speed_kmh, acceleration):
         wheel_style = "none"
         movement_label = "STATIONARY"
     else:
-        drive_duration = max(1.2, min(8.0, 8.0 / max(0.5, speed / 2)))
+        # 속도가 빠를수록 좌우 왕복 주기가 짧아짐
+        drive_duration = max(2.0, min(12.0, 12.0 / max(0.5, speed / 2)))
         wheel_duration = max(0.18, min(2.0, 5.0 / max(1.0, speed)))
         drive_style = f"drive {drive_duration:.2f}s ease-in-out infinite"
         wheel_style = f"spin {wheel_duration:.2f}s linear infinite"
         movement_label = "MOVING"
 
-    # 가속도가 클수록 출발 시 차체의 움직임이 더 빠르게 붙는 효과
+    # 가속도가 클수록 왕복 시 가속하는 느낌이 강해짐
     accel_factor = min(1.0, accel / 5.0)
     ease_x1 = 0.05 + 0.25 * accel_factor
     ease_x2 = 0.55 + 0.40 * accel_factor
@@ -311,7 +310,6 @@ def robot_svg(wheel_radius_cm, mass, motor_count, speed_kmh, acceleration):
     if speed >= 0.05:
         drive_style = f"drive {drive_duration:.2f}s {easing} infinite"
 
-    # 가속도에 따라 센서 빛의 맥박도 조금 달라짐
     pulse_duration = max(0.35, 1.8 - min(accel, 5.0) * 0.22)
 
     return f"""
@@ -336,7 +334,7 @@ def robot_svg(wheel_radius_cm, mass, motor_count, speed_kmh, acceleration):
 
         .wrap {{
             width: 100%;
-            min-height: 255px;
+            min-height: 270px;
             overflow: hidden;
             border: 1px solid #293b53;
             border-radius: 18px;
@@ -358,6 +356,12 @@ def robot_svg(wheel_radius_cm, mass, motor_count, speed_kmh, acceleration):
             padding: 3px 5px 0;
         }}
 
+        .top-right {{
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }}
+
         .status {{
             color: #e8f2ff;
             background: #152b40;
@@ -368,11 +372,28 @@ def robot_svg(wheel_radius_cm, mass, motor_count, speed_kmh, acceleration):
             white-space: nowrap;
         }}
 
+        .control-btn {{
+            border: 1px solid #4a6a8b;
+            background: #1a3049;
+            color: #ffffff;
+            border-radius: 7px;
+            padding: 6px 10px;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+        }}
+
+        .control-btn:hover {{
+            background: #25486a;
+            border-color: #65e2d1;
+        }}
+
         svg {{
             display: block;
             width: 100%;
             height: auto;
-            max-height: 205px;
+            max-height: 220px;
         }}
 
         #robot {{
@@ -396,11 +417,13 @@ def robot_svg(wheel_radius_cm, mass, motor_count, speed_kmh, acceleration):
         }}
 
         @keyframes drive {{
-            0%   {{ transform: translateX(-17px) translateY(0px); }}
-            25%  {{ transform: translateX(-7px) translateY(-1px); }}
-            50%  {{ transform: translateX(17px) translateY(0px); }}
-            75%  {{ transform: translateX(7px) translateY(-1px); }}
-            100% {{ transform: translateX(-17px) translateY(0px); }}
+            0%   {{ transform: translateX(-115px) translateY(0px); }}
+            10%  {{ transform: translateX(-92px) translateY(-1px); }}
+            25%  {{ transform: translateX(-45px) translateY(0px); }}
+            50%  {{ transform: translateX(115px) translateY(0px); }}
+            65%  {{ transform: translateX(70px) translateY(-1px); }}
+            85%  {{ transform: translateX(-45px) translateY(0px); }}
+            100% {{ transform: translateX(-115px) translateY(0px); }}
         }}
 
         @keyframes spin {{
@@ -418,6 +441,13 @@ def robot_svg(wheel_radius_cm, mass, motor_count, speed_kmh, acceleration):
             to   {{ opacity: .75; }}
         }}
 
+        .paused #robot,
+        .paused .wheel,
+        .paused .sensor,
+        .paused .floorGlow {{
+            animation-play-state: paused !important;
+        }}
+
         @media (prefers-reduced-motion: reduce) {{
             #robot, .wheel, .sensor, .floorGlow {{
                 animation: none !important;
@@ -427,13 +457,19 @@ def robot_svg(wheel_radius_cm, mass, motor_count, speed_kmh, acceleration):
     </head>
 
     <body>
-    <div class="wrap">
+    <div class="wrap" id="preview">
       <div class="topline">
         <span>DESIGN PREVIEW / LIVE MODEL</span>
-        <span class="status">{movement_label}</span>
+
+        <div class="top-right">
+          <span class="status" id="status">{movement_label}</span>
+          <button class="control-btn" id="toggleBtn" type="button">
+            ❚❚ 멈춤
+          </button>
+        </div>
       </div>
 
-      <svg viewBox="0 0 420 230"
+      <svg viewBox="0 0 420 250"
            xmlns="http://www.w3.org/2000/svg"
            role="img"
            aria-label="속도와 가속도에 반응하는 로봇 개념도">
@@ -459,7 +495,7 @@ def robot_svg(wheel_radius_cm, mass, motor_count, speed_kmh, acceleration):
         </defs>
 
         <ellipse class="floorGlow"
-                 cx="210" cy="177" rx="148" ry="25"
+                 cx="210" cy="184" rx="148" ry="25"
                  fill="url(#floorGrad)"/>
 
         <g id="robot">
@@ -571,14 +607,14 @@ def robot_svg(wheel_radius_cm, mass, motor_count, speed_kmh, acceleration):
 
         </g>
 
-        <text x="210" y="204" text-anchor="middle"
+        <text x="210" y="218" text-anchor="middle"
               fill="#d5e4f6"
               font-family="monospace"
               font-size="11">
           SPEED {speed:.1f} km/h
         </text>
 
-        <text x="210" y="220" text-anchor="middle"
+        <text x="210" y="234" text-anchor="middle"
               fill="#9fb4ce"
               font-family="monospace"
               font-size="10">
@@ -587,6 +623,28 @@ def robot_svg(wheel_radius_cm, mass, motor_count, speed_kmh, acceleration):
 
       </svg>
     </div>
+
+    <script>
+      const preview = document.getElementById("preview");
+      const toggleBtn = document.getElementById("toggleBtn");
+      const status = document.getElementById("status");
+
+      let paused = false;
+
+      toggleBtn.addEventListener("click", function () {
+          paused = !paused;
+
+          if (paused) {
+              preview.classList.add("paused");
+              toggleBtn.textContent = "▶ 다시 움직이기";
+              status.textContent = "PAUSED";
+          } else {
+              preview.classList.remove("paused");
+              toggleBtn.textContent = "❚❚ 멈춤";
+              status.textContent = "{movement_label}";
+          }
+      });
+    </script>
     </body>
     </html>
     """
@@ -737,6 +795,7 @@ def make_report(params, result):
 
 
 def csv_download(df, label, filename):
+    # UTF-8 BOM을 사용해 Excel에서 한글이 깨지는 문제를 줄임
     data = df.to_csv(index=False).encode("utf-8-sig")
 
     st.download_button(
@@ -868,7 +927,6 @@ if page == "설계 연구소":
             unsafe_allow_html=True,
         )
 
-        # 속도와 가속도 계산 결과를 프리뷰 애니메이션에 전달
         components.html(
             robot_svg(
                 params["wheel_radius"],
@@ -877,7 +935,7 @@ if page == "설계 연구소":
                 result["speed_kmh"],
                 result["acceleration"],
             ),
-            height=280,
+            height=295,
             scrolling=False,
         )
 
@@ -1116,28 +1174,28 @@ elif page == "공학 원리":
         )
 
     with st.expander("2. 바퀴의 선속도"):
-        st.latex(r"v = r\omega")
+        st.latex(r"v = r\\omega")
         st.write(
             "바퀴 반지름 r과 각속도 ω로 이상적인 선속도를 계산합니다. "
             "감속기를 사용하면 출력 회전수는 모터 회전수를 감속비로 나눈 값으로 근사합니다."
         )
 
     with st.expander("3. 토크와 구동력"):
-        st.latex(r"F = \frac{\tau}{r}")
+        st.latex(r"F = \\frac{\\tau}{r}")
         st.write(
             "바퀴 토크가 커지면 이상적인 구동력이 커집니다. "
             "같은 토크에서는 바퀴 반지름이 클수록 구동력이 작아집니다."
         )
 
     with st.expander("4. 뉴턴의 운동 법칙"):
-        st.latex(r"a = \frac{F_{\mathrm{net}}}{m}")
+        st.latex(r"a = \\frac{F_{\\mathrm{net}}}{m}")
         st.write(
             "가속도는 알짜힘을 질량으로 나눈 값입니다. 실제 로봇에는 "
             "회전 관성, 마찰, 접지력과 제어 방식도 영향을 줍니다."
         )
 
     with st.expander("5. 작동 시간 근사"):
-        st.latex(r"t \approx \frac{E_{\mathrm{usable}}}{P_{\mathrm{average}}}")
+        st.latex(r"t \\approx \\frac{E_{\\mathrm{usable}}}{P_{\\mathrm{average}}}")
         st.write(
             "사용 가능 에너지를 평균 소비 전력으로 나누어 작동 시간을 근사합니다. "
             "실제 작동 시간은 주행 환경과 부하에 따라 달라집니다."
@@ -1167,6 +1225,7 @@ elif page == "사용 설명서":
           배터리 조건을 조절합니다.
         - 오른쪽 성능 지표와 아래 그래프를 확인합니다.
         - 프리뷰 애니메이션은 계산된 속도와 가속도에 따라 달라집니다.
+        - 프리뷰 오른쪽 위 버튼으로 애니메이션을 멈추거나 다시 재생할 수 있습니다.
         """)
 
     with st.expander("2. 결과 읽는 법"):
@@ -1214,7 +1273,7 @@ else:
     - **Python** — 계산 로직
     - **Streamlit** — 웹 UI와 상호작용
     - **Pandas** — 표와 CSV 보고서
-    - **SVG / CSS** — 로봇 개념도와 애니메이션
+    - **SVG / CSS / JavaScript** — 로봇 개념도와 애니메이션
 
     ### 탐구 질문
 
