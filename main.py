@@ -174,10 +174,10 @@ div[data-testid="stMetricValue"] {
 }
 
 /* ---------------------------------------------------------
-   선택창 (Selectbox) 글씨 흐림 현상 완벽 해결 CSS
+   선택창 (Selectbox) 글씨 선명함 완벽 보정 CSS
 --------------------------------------------------------- */
 
-/* Selectbox 외부 컨테이너 배경 및 테두리 강제 지정 */
+/* 셀렉트박스 메인 컨테이너 박스 배경과 테두리 색상 강제 지정 */
 div[data-baseweb="select"] {
     background-color: #162b47 !important;
     border-radius: 8px !important;
@@ -189,24 +189,23 @@ div[data-baseweb="select"] > div {
     border-radius: 8px !important;
 }
 
-/* 선택된 항목의 글씨를 선명한 흰색/민트색으로 강제 고정 (투명도 제거) */
+/* 선택된 값의 텍스트가 흐리지 않고 완전히 진한 흰색/민트색으로 출력되도록 설정 */
 div[data-baseweb="select"] span,
-div[data-baseweb="select"] div,
-[data-baseweb="select"] [data-testid="stMarkdownContainer"] p {
+div[data-baseweb="select"] div {
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
     font-weight: 700 !important;
     opacity: 1 !important;
 }
 
-/* 드롭다운 화살표 아이콘 선명하게 */
+/* 드롭다운 화살표 아이콘 */
 div[data-baseweb="select"] svg {
     fill: #65e2d1 !important;
     color: #65e2d1 !important;
     opacity: 1 !important;
 }
 
-/* 드롭다운 메뉴 열렸을 때의 항목들 스타일 */
+/* 드롭다운 메뉴 열렸을 때의 팝업 리스트 스타일 */
 ul[data-baseweb="menu"] {
     background-color: #101c2e !important;
     border: 1px solid #65e2d1 !important;
