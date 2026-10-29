@@ -174,34 +174,33 @@ div[data-testid="stMetricValue"] {
 }
 
 /* ---------------------------------------------------------
-   선택창 (Selectbox) 글씨 선명함 완벽 보정 CSS
+   선택창 (Selectbox) 글씨 남색(Navy) 적용 CSS
 --------------------------------------------------------- */
 
-/* 셀렉트박스 메인 컨테이너 박스 배경과 테두리 색상 강제 지정 */
 div[data-baseweb="select"] {
-    background-color: #162b47 !important;
+    background-color: #ffffff !important;
     border-radius: 8px !important;
 }
 
 div[data-baseweb="select"] > div {
-    background-color: #162b47 !important;
+    background-color: #ffffff !important;
     border: 1.5px solid #65e2d1 !important;
     border-radius: 8px !important;
 }
 
-/* 선택된 값의 텍스트가 흐리지 않고 완전히 진한 흰색/민트색으로 출력되도록 설정 */
+/* 선택된 값의 텍스트를 남색(#0b192c 또는 #0c1421)으로 강제 지정 */
 div[data-baseweb="select"] span,
 div[data-baseweb="select"] div {
-    color: #ffffff !important;
-    -webkit-text-fill-color: #ffffff !important;
-    font-weight: 700 !important;
+    color: #0c1421 !important;
+    -webkit-text-fill-color: #0c1421 !important;
+    font-weight: 800 !important;
     opacity: 1 !important;
 }
 
 /* 드롭다운 화살표 아이콘 */
 div[data-baseweb="select"] svg {
-    fill: #65e2d1 !important;
-    color: #65e2d1 !important;
+    fill: #0c1421 !important;
+    color: #0c1421 !important;
     opacity: 1 !important;
 }
 
