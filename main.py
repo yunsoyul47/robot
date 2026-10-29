@@ -174,46 +174,39 @@ div[data-testid="stMetricValue"] {
 }
 
 /* ---------------------------------------------------------
-   선택창 (Selectbox) 가독성 개선 CSS (배경을 어둡게, 글씨 선명하게)
+   선택창 (Selectbox) 글씨 흐림 현상 완벽 해결 CSS
 --------------------------------------------------------- */
 
-/* 선택창 최외각 및 내부 컨테이너 배경을 다크톤으로 고정 */
+/* Selectbox 외부 컨테이너 배경 및 테두리 강제 지정 */
 div[data-baseweb="select"] {
-    background-color: #101c2e !important;
+    background-color: #162b47 !important;
     border-radius: 8px !important;
 }
 
 div[data-baseweb="select"] > div {
-    background-color: #101c2e !important;
+    background-color: #162b47 !important;
     border: 1.5px solid #65e2d1 !important;
     border-radius: 8px !important;
 }
 
-/* 선택창 안의 텍스트가 흐리지 않고 민트색으로 진하게 표시되도록 설정 */
-div[data-baseweb="select"] span {
-    color: #65e2d1 !important;
-    -webkit-text-fill-color: #65e2d1 !important;
+/* 선택된 항목의 글씨를 선명한 흰색/민트색으로 강제 고정 (투명도 제거) */
+div[data-baseweb="select"] span,
+div[data-baseweb="select"] div,
+[data-baseweb="select"] [data-testid="stMarkdownContainer"] p {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
     font-weight: 700 !important;
     opacity: 1 !important;
 }
 
-div[data-baseweb="select"] * {
-    background-color: transparent !important;
-}
-
-/* 드래그/선택 하이라이트 영역 */
-div[data-baseweb="select"] *::selection {
-    background-color: #102e30 !important;
-    color: #65e2d1 !important;
-}
-
-/* 드롭다운 아이콘 (화살표) */
+/* 드롭다운 화살표 아이콘 선명하게 */
 div[data-baseweb="select"] svg {
     fill: #65e2d1 !important;
     color: #65e2d1 !important;
+    opacity: 1 !important;
 }
 
-/* 클릭 시 열리는 옵션 메뉴 팝업 */
+/* 드롭다운 메뉴 열렸을 때의 항목들 스타일 */
 ul[data-baseweb="menu"] {
     background-color: #101c2e !important;
     border: 1px solid #65e2d1 !important;
