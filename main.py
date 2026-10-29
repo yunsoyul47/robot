@@ -1,67 +1,3 @@
-import math
-import pandas as pd
-import streamlit as st
-import streamlit.components.v1 as components
-
-# =========================================================
-# ROBO LAB | Robot Design Studio
-# =========================================================
-
-st.set_page_config(
-    page_title="ROBO LAB | Robot Design Studio",
-    page_icon="🤖",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
-
-# ---------------------------------------------------------
-# CSS
-# ---------------------------------------------------------
-
-st.markdown(
-    """
-<style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
-
-:root {
-    --ink: #edf4ff;
-    --muted: #b9c8dc;
-    --line: #293b53;
-    --blue: #6ba8ff;
-    --cyan: #65e2d1;
-}
-
-.stApp {
-    background: radial-gradient(ellipse at 10% 0%, #162b47 0%, #0b1220 43%, #080d16 100%);
-    color: var(--ink);
-}
-
-html, body, [class*="css"] {
-    font-family: 'Manrope', sans-serif;
-}
-
-[data-testid="stSidebar"] {
-    background: #0c1421;
-    border-right: 1px solid #26354a;
-}
-
-[data-testid="stSidebar"] * {
-    color: #edf4ff;
-}
-
-h1, h2, h3 {
-    color: #ffffff !important;
-    font-weight: 800 !important;
-    letter-spacing: -0.035em;
-}
-
-.hero {
-    padding: 24px 26px;
-    border: 1px solid #2b4260;
-    border-radius: 20px;
-    background: linear-gradient(120deg, #1c3553, #0e1929);
-    margin-bottom: 24px;
-}
 
 .hero-title {
     font-size: clamp(32px, 4vw, 52px);
@@ -94,3 +30,163 @@ h1, h2, h3 {
     font-family: 'DM Mono', monospace;
     font-size: 10px;
     letter-spacing: 1px;
+}
+
+div[data-testid="stMetric"] {
+    background: rgba(18, 28, 43, .92);
+    border: 1px solid #30435c;
+    padding: 15px;
+    border-radius: 14px;
+}
+
+div[data-testid="stMetricLabel"],
+div[data-testid="stMetricLabel"] p {
+    color: #d5e2f3 !important;
+}
+
+div[data-testid="stMetricValue"] {
+    color: #ffffff !important;
+}
+
+/* 위젯 라벨 (설계 목표 등) */
+[data-testid="stWidgetLabel"] p,
+[data-testid="stWidgetLabel"] label {
+    color: #65e2d1 !important;
+    font-weight: 700 !important;
+}
+
+[data-testid="stMarkdownContainer"] p,
+[data-testid="stMarkdownContainer"] li {
+    color: #e7eef9;
+    opacity: 1;
+}
+
+/* 사이드바 제목 보정 */
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] strong,
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] b {
+    color: #65e2d1 !important;
+    font-size: 16px !important;
+}
+
+[data-testid="stAlert"] {
+    background: #142b46 !important;
+    border: 1px solid #42658b !important;
+}
+
+[data-testid="stAlert"] p,
+[data-testid="stAlert"] span,
+[data-testid="stAlert"] div {
+    color: #ffffff !important;
+    opacity: 1 !important;
+    font-weight: 600 !important;
+}
+
+.stButton > button {
+    border-radius: 10px;
+    font-weight: 700;
+    min-height: 42px;
+}
+
+[data-testid="stDownloadButton"] button {
+    background: #eaf2ff !important;
+    color: #102033 !important;
+    border: 1px solid #8ba6c8 !important;
+    font-weight: 800 !important;
+    opacity: 1 !important;
+}
+
+[data-testid="stDownloadButton"] button p,
+[data-testid="stDownloadButton"] button span,
+[data-testid="stDownloadButton"] button svg {
+    color: #102033 !important;
+    fill: #102033 !important;
+    -webkit-text-fill-color: #102033 !important;
+    opacity: 1 !important;
+    font-weight: 800 !important;
+}
+
+[data-testid="stDownloadButton"] button:hover {
+    background: #65e2d1 !important;
+}
+
+/* ---------------------------------------------------------
+   선택창 (Selectbox) 및 드래그 영역 민트색 강화 CSS
+--------------------------------------------------------- */
+
+/* 선택창 최외각 컨테이너 */
+div[data-baseweb="select"] {
+    background-color: #162b47 !important;
+    border-radius: 8px !important;
+}
+
+/* 선택창 내부 입력영역 전체 */
+div[data-baseweb="select"] > div {
+    background-color: #162b47 !important;
+    border: 1.5px solid #65e2d1 !important;
+    border-radius: 8px !important;
+}
+
+/* 선택창 텍스트 (범용 이동 로봇 등) - 강제 민트색 및 흰색 배경 제거 */
+div[data-baseweb="select"] * {
+    background-color: transparent !important;
+    color: #65e2d1 !important;
+    -webkit-text-fill-color: #65e2d1 !important;
+    font-weight: 700 !important;
+}
+
+/* 드래그/선택 하이라이트 영역 민트색 커스텀 */
+div[data-baseweb="select"] *::selection {
+    background-color: #102e30 !important;
+    color: #65e2d1 !important;
+}
+
+/* 드롭다운 아이콘 (화살표) */
+div[data-baseweb="select"] svg {
+    fill: #65e2d1 !important;
+    color: #65e2d1 !important;
+}
+
+/* 클릭 시 열리는 옵션 메뉴 팝업 */
+ul[data-baseweb="menu"] {
+    background-color: #101c2e !important;
+    border: 1px solid #65e2d1 !important;
+}
+
+ul[data-baseweb="menu"] * {
+    color: #65e2d1 !important;
+    -webkit-text-fill-color: #65e2d1 !important;
+    font-weight: 600 !important;
+}
+
+ul[data-baseweb="menu"] li:hover {
+    background-color: #162b47 !important;
+}
+
+/* 텍스트 입력창 (stTextInput) 스타일 */
+div[data-testid="stTextInput"] input {
+    background-color: #162b47 !important;
+    color: #ffffff !important;
+    border: 1px solid #365378 !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+}
+
+/* 익스팬더 (stExpander) 헤더 스타일 */
+div[data-testid="stExpander"] {
+    background-color: #101c2e !important;
+    border: 1px solid #293b53 !important;
+    border-radius: 12px !important;
+}
+
+div[data-testid="stExpander"] summary {
+    background-color: #162a42 !important;
+    color: #65e2d1 !important;
+    border-radius: 10px !important;
+}
+
+div[data-testid="stExpander"] summary p,
+div[data-testid="stExpander"] summary span,
+div[data-testid="stExpander"] summary svg {
+    color: #65e2d1 !important;
+    fill: #65e2d1 !important;
+    font-weight: 700 !important;
