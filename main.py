@@ -112,20 +112,12 @@ div[data-testid="stMetricValue"] {
     color: #ffffff !important;
 }
 
-/* 위젯 라벨 (설계 목표 등) */
-[data-testid="stWidgetLabel"] p,
-[data-testid="stWidgetLabel"] label {
-    color: #65e2d1 !important;
-    font-weight: 700 !important;
-}
-
 [data-testid="stMarkdownContainer"] p,
 [data-testid="stMarkdownContainer"] li {
     color: #e7eef9;
     opacity: 1;
 }
 
-/* 사이드바 제목 보정 */
 [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] strong,
 [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] b {
     color: #65e2d1 !important;
@@ -145,10 +137,20 @@ div[data-testid="stMetricValue"] {
     font-weight: 600 !important;
 }
 
+/* 프리셋 적용 버튼 스타일 커스텀 */
 .stButton > button {
+    background: linear-gradient(135deg, #1c3553, #102e30) !important;
+    border: 1.5px solid #65e2d1 !important;
+    color: #65e2d1 !important;
     border-radius: 10px;
     font-weight: 700;
-    min-height: 42px;
+    min-height: 44px;
+    width: 100%;
+}
+
+.stButton > button:hover {
+    background: #65e2d1 !important;
+    color: #102033 !important;
 }
 
 [data-testid="stDownloadButton"] button {
@@ -171,54 +173,6 @@ div[data-testid="stMetricValue"] {
 
 [data-testid="stDownloadButton"] button:hover {
     background: #65e2d1 !important;
-}
-
-/* ---------------------------------------------------------
-   선택창 (Selectbox) 글씨 남색(Navy) 적용 CSS
---------------------------------------------------------- */
-
-div[data-baseweb="select"] {
-    background-color: #ffffff !important;
-    border-radius: 8px !important;
-}
-
-div[data-baseweb="select"] > div {
-    background-color: #ffffff !important;
-    border: 1.5px solid #65e2d1 !important;
-    border-radius: 8px !important;
-}
-
-/* 선택된 값의 텍스트를 남색(#0b192c 또는 #0c1421)으로 강제 지정 */
-div[data-baseweb="select"] span,
-div[data-baseweb="select"] div {
-    color: #0c1421 !important;
-    -webkit-text-fill-color: #0c1421 !important;
-    font-weight: 800 !important;
-    opacity: 1 !important;
-}
-
-/* 드롭다운 화살표 아이콘 */
-div[data-baseweb="select"] svg {
-    fill: #0c1421 !important;
-    color: #0c1421 !important;
-    opacity: 1 !important;
-}
-
-/* 드롭다운 메뉴 열렸을 때의 팝업 리스트 스타일 */
-ul[data-baseweb="menu"] {
-    background-color: #101c2e !important;
-    border: 1px solid #65e2d1 !important;
-}
-
-ul[data-baseweb="menu"] * {
-    color: #65e2d1 !important;
-    -webkit-text-fill-color: #65e2d1 !important;
-    font-weight: 600 !important;
-    opacity: 1 !important;
-}
-
-ul[data-baseweb="menu"] li:hover {
-    background-color: #162b47 !important;
 }
 
 /* 텍스트 입력창 (stTextInput) 스타일 */
@@ -733,7 +687,7 @@ def robot_svg(wheel_radius_cm, mass, motor_count, speed_kmh, acceleration):
 
 
 # ---------------------------------------------------------
-# DESIGN CONTROLS
+# DESIGN CONTROLS (WITH PRESET SUPPORT)
 # ---------------------------------------------------------
 
 def make_design(prefix, defaults):
@@ -975,16 +929,25 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("**설계 목표**")
 
-    objective = st.selectbox(
-        "어떤 로봇을 설계할까요?",
-        [
-            "범용 이동 로봇",
-            "빠른 주행 로봇",
-            "장시간 작동 로봇",
-            "경사로 주행 로봇",
-            "적재용 로봇",
-        ],
-    )
+    # 세션 스테이트를 이용한 안정적인 모듈 프리셋 적용 로직
+    if "preset_applied" not in st.session_state:
+        st.session_state.preset_applied = False
+
+    if st.button("✨ 가장 안정적인 로봇 모듈 예시 적용"):
+        st.session_state.A_name = "Stable Explorer"
+        st.session_state.A_mass = 8.0
+        st.session_state.A_payload = 2.0
+        st.session_state.A_power = 100
+        st.session_state.A_count = 2
+        st.session_state.A_rpm = 3000
+        st.session_state.A_gear = 10.0
+        st.session_state.A_wheel = 8.0
+        st.session_state.A_volt = 24
+        st.session_state.A_ah = 8.0
+        st.session_state.A_eff = 80
+        st.session_state.A_rolling = 0.03
+        st.session_state.A_slope = 0
+        st.success("안정적인 모듈 설정값이 적용되었습니다!")
 
     st.caption(
         "계산 결과는 교육용 추정값입니다. 실제 제작 시 "
