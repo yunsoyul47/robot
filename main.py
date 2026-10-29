@@ -174,31 +174,34 @@ div[data-testid="stMetricValue"] {
 }
 
 /* ---------------------------------------------------------
-   선택창 (Selectbox) 및 드래그 영역 민트색 강화 CSS
+   선택창 (Selectbox) 가독성 개선 CSS (배경을 어둡게, 글씨 선명하게)
 --------------------------------------------------------- */
 
-/* 선택창 최외각 컨테이너 */
+/* 선택창 최외각 및 내부 컨테이너 배경을 다크톤으로 고정 */
 div[data-baseweb="select"] {
-    background-color: #162b47 !important;
+    background-color: #101c2e !important;
     border-radius: 8px !important;
 }
 
-/* 선택창 내부 입력영역 전체 */
 div[data-baseweb="select"] > div {
-    background-color: #162b47 !important;
+    background-color: #101c2e !important;
     border: 1.5px solid #65e2d1 !important;
     border-radius: 8px !important;
 }
 
-/* 선택창 텍스트 (범용 이동 로봇 등) - 강제 민트색 및 흰색 배경 제거 */
-div[data-baseweb="select"] * {
-    background-color: transparent !important;
+/* 선택창 안의 텍스트가 흐리지 않고 민트색으로 진하게 표시되도록 설정 */
+div[data-baseweb="select"] span {
     color: #65e2d1 !important;
     -webkit-text-fill-color: #65e2d1 !important;
     font-weight: 700 !important;
+    opacity: 1 !important;
 }
 
-/* 드래그/선택 하이라이트 영역 민트색 커스텀 */
+div[data-baseweb="select"] * {
+    background-color: transparent !important;
+}
+
+/* 드래그/선택 하이라이트 영역 */
 div[data-baseweb="select"] *::selection {
     background-color: #102e30 !important;
     color: #65e2d1 !important;
@@ -220,6 +223,7 @@ ul[data-baseweb="menu"] * {
     color: #65e2d1 !important;
     -webkit-text-fill-color: #65e2d1 !important;
     font-weight: 600 !important;
+    opacity: 1 !important;
 }
 
 ul[data-baseweb="menu"] li:hover {
@@ -651,9 +655,9 @@ def robot_svg(wheel_radius_cm, mass, motor_count, speed_kmh, acceleration):
               <path d="M124 {155-wheel_r+3} V{155+wheel_r-3}"/>
               <path d="M{124-wheel_r+3} 155 H{124+wheel_r-3}"/>
               <path d="M{124-wheel_r*.65:.1f} {155-wheel_r*.65:.1f}
-                       L{124+wheel_r*.65:.1f} {155+wheel_r*.65:.1f}"/>
+                        L{124+wheel_r*.65:.1f} {155+wheel_r*.65:.1f}"/>
               <path d="M{124-wheel_r*.65:.1f} {155+wheel_r*.65:.1f}
-                       L{124+wheel_r*.65:.1f} {155-wheel_r*.65:.1f}"/>
+                        L{124+wheel_r*.65:.1f} {155-wheel_r*.65:.1f}"/>
             </g>
 
             <circle cx="124" cy="155" r="5" fill="#65e2d1"/>
@@ -674,9 +678,9 @@ def robot_svg(wheel_radius_cm, mass, motor_count, speed_kmh, acceleration):
               <path d="M296 {155-wheel_r+3} V{155+wheel_r-3}"/>
               <path d="M{296-wheel_r+3} 155 H{296+wheel_r-3}"/>
               <path d="M{296-wheel_r*.65:.1f} {155-wheel_r*.65:.1f}
-                       L{296+wheel_r*.65:.1f} {155+wheel_r*.65:.1f}"/>
+                        L{296+wheel_r*.65:.1f} {155+wheel_r*.65:.1f}"/>
               <path d="M{296-wheel_r*.65:.1f} {155+wheel_r*.65:.1f}
-                       L{296+wheel_r*.65:.1f} {155-wheel_r*.65:.1f}"/>
+                        L{296+wheel_r*.65:.1f} {155-wheel_r*.65:.1f}"/>
             </g>
 
             <circle cx="296" cy="155" r="5" fill="#65e2d1"/>
@@ -1212,74 +1216,33 @@ elif page == "설계안 비교":
             "추정 주행 가능 거리 (km)",
         ],
         name_a: [
-            ra["total_mass"],
-            ra["total_power"],
-            ra["speed_kmh"],
-            ra["acceleration"],
-            ra["traction_force"],
-            ra["battery_wh"],
-            ra["runtime_minutes"],
-            ra["range_km"],
+            f"{ra['total_mass']:.1f}",
+            f"{ra['total_power']:.0f}",
+            f"{ra['speed_kmh']:.1f}",
+            f"{ra['acceleration']:.2f}",
+            f"{ra['traction_force']:.1f}",
+            f"{ra['battery_wh']:.0f}",
+            f"{ra['runtime_minutes']:.0f}",
+            f"{ra['range_km']:.2f}",
         ],
         name_b: [
-            rb["total_mass"],
-            rb["total_power"],
-            rb["speed_kmh"],
-            rb["acceleration"],
-            rb["traction_force"],
-            rb["battery_wh"],
-            rb["runtime_minutes"],
-            rb["range_km"],
+            f"{rb['total_mass']:.1f}",
+            f"{rb['total_power']:.0f}",
+            f"{rb['speed_kmh']:.1f}",
+            f"{rb['acceleration']:.2f}",
+            f"{rb['traction_force']:.1f}",
+            f"{rb['battery_wh']:.0f}",
+            f"{rb['runtime_minutes']:.0f}",
+            f"{rb['range_km']:.2f}",
         ],
     })
 
-    st.dataframe(
-        compare.set_index("항목").style.format("{:.2f}"),
-        use_container_width=True,
-    )
-
-    st.markdown("### 성능 그래프")
-
-    chart_df = pd.DataFrame({
-        name_a: [
-            ra["speed_kmh"],
-            ra["acceleration"],
-            ra["runtime_minutes"],
-        ],
-        name_b: [
-            rb["speed_kmh"],
-            rb["acceleration"],
-            rb["runtime_minutes"],
-        ],
-    }, index=[
-        "최고 속도 (km/h)",
-        "가속도 (m/s²)",
-        "작동 시간 (min)",
-    ])
-
-    st.bar_chart(chart_df)
-
-    st.markdown("### 비교 분석")
-
-    speed_winner = (
-        name_a if ra["speed_kmh"] > rb["speed_kmh"]
-        else name_b if rb["speed_kmh"] > ra["speed_kmh"]
-        else "두 설계안이 동일"
-    )
-
-    runtime_winner = (
-        name_a if ra["runtime_minutes"] > rb["runtime_minutes"]
-        else name_b if rb["runtime_minutes"] > ra["runtime_minutes"]
-        else "두 설계안이 동일"
-    )
-
-    st.success(f"속도 측면: **{speed_winner}** 설계안의 추정 속도가 더 높습니다.")
-    st.success(f"작동 시간 측면: **{runtime_winner}** 설계안의 추정 작동 시간이 더 깁니다.")
+    st.dataframe(compare, use_container_width=True, hide_index=True)
 
     csv_download(
         compare,
-        "⬇ 비교 결과 CSV 다운로드",
-        "robo_lab_comparison.csv",
+        "⬇ 비교 보고서 CSV 다운로드",
+        "robo_lab_comparison_report.csv",
     )
 
 
@@ -1289,40 +1252,32 @@ elif page == "설계안 비교":
 
 elif page == "공학 원리":
     st.markdown(
-        '<div class="section-kicker">04 / ENGINEERING NOTES</div>',
+        '<div class="section-kicker">04 / ENGINEERING PRINCIPLES</div>',
         unsafe_allow_html=True,
     )
-    st.header("계산에 사용한 공학 원리")
+    st.header("로봇 공학 핵심 원리")
+    st.write("ROBO LAB 시뮬레이터에 적용된 물리 및 구동계 기초 이론입니다.")
 
-    with st.expander("1. 배터리 에너지 (Energy)", expanded=True):
-        st.latex(r"E = V \times Q")
-        st.write(
-            "전압 V(Volt)와 용량 Q(Ah)를 곱하면 Wh 단위의 명목 에너지를 "
-            "계산할 수 있습니다. 실제 사용 가능 에너지는 방전율, 온도, "
-            "배터리 종류와 보호회로에 따라 달라집니다."
-        )
+    st.markdown("### 1. 토크와 구동력 (Torque & Traction Force)")
+    st.write(
+        "모터가 회전하면서 발생하는 토크($T$)는 감속비($G$)를 거치면서 증폭되고, "
+        "바퀴의 반지름($r$)에 의해 지면을 미는 구동력($F$)으로 변환됩니다."
+    )
+    st.latex(r"F = \frac{T \cdot G}{r}")
 
-    with st.expander("2. 바퀴의 선속도 (Linear Velocity)"):
-        st.latex(r"v = r \times \omega")
-        st.write(
-            "바퀴 반지름 r과 각속도 ω로 이상적인 선속도를 계산합니다. "
-            "감속기를 사용하면 출력 회전수는 모터 회전수를 감속비로 나눈 값으로 근사합니다."
-        )
+    st.markdown("### 2. 주행 저항 (Resistance Forces)")
+    st.write(
+        "로봇이 이동할 때 지면과의 마찰로 발생하는 구름 저항($F_r$)과 "
+        "경사면을 오를 때 발생하는 경사 저항($F_s$)이 합쳐져 전체 저항을 이룹니다."
+    )
+    st.latex(r"R = \mu \cdot m \cdot g \cdot \cos\theta + m \cdot g \cdot \sin\theta")
 
-    with st.expander("3. 토크와 구동력 (Torque & Force)"):
-        st.latex(r"F = \frac{\tau}{r}")
-        st.write(
-            "바퀴 토크가 커지면 이상적인 구동력이 커집니다. "
-            "같은 토크에서는 바퀴 반지름이 클수록 구동력이 작아집니다."
-        )
-
-    with st.expander("4. 주행 저항 및 가속도 (Resistance & Acceleration)"):
-        st.latex(r"F_{\text{net}} = F_{\text{traction}} - (F_{\text{rolling}} + F_{\text{slope}})")
-        st.latex(r"a = \frac{F_{\text{net}}}{m}")
-        st.write(
-            "구름 저항과 경사 저항의 합보다 견인력(구동력)이 더 커야 로봇이 가속할 수 있습니다. "
-            "뉴턴의 제2법칙(F=ma)에 따라 알짜힘을 전체 질량으로 나누어 가속도를 계산합니다."
-        )
+    st.markdown("### 3. 가속도와 운동 방정식 (Acceleration)")
+    st.write(
+        "구동력에서 주행 저항을 뺀 알짜힘(Net Force)을 총 질량으로 나누면 "
+        "로봇의 순간 가속도($a$)가 도출됩니다."
+    )
+    st.latex(r"a = \frac{F - R}{m}")
 
 
 # =========================================================
@@ -1331,24 +1286,20 @@ elif page == "공학 원리":
 
 elif page == "사용 설명서":
     st.markdown(
-        '<div class="section-kicker">05 / USER GUIDE</div>',
+        '<div class="section-kicker">05 / USER MANUAL</div>',
         unsafe_allow_html=True,
     )
     st.header("사용 설명서")
+    st.write("ROBO LAB 스튜디오를 활용하는 방법입니다.")
 
-    st.markdown("""
-    ### 🛠️ 주요 기능 설명
-    1. **설계 연구소**
-       - 슬라이더 및 입력 폼을 통해 차체 질량, 모터 사양, 감속비, 바퀴 크기 등을 실시간으로 조정합니다.
-       - 시뮬레이터 애니메이션과 하단 매트릭을 통해 최고 속도, 가속도, 작동 시간 등의 변화를 관찰할 수 있습니다.
-       - 설계를 완성한 후 CSV 버튼을 통해 설계 보고서를 다운로드할 수 있습니다.
+    st.markdown("#### 1. 설계 연구소 활용법")
+    st.write("- 사이드바에서 로봇의 질량, 모터, 배터리 등 물리적 요소를 변경합니다.")
+    st.write("- 실시간으로 반영되는 3D 스타일 애니메이션 개념도와 성능 지표를 모니터링합니다.")
+    st.write("- 질량 변화에 따른 가속도/속도 그래프를 참고하여 최적의 스펙을 찾습니다.")
 
-    2. **설계안 비교**
-       - 서로 다른 2개의 설계(A/B) 파라미터를 동시 비교하여 최적의 모듈 구성을 탐색합니다.
-
-    3. **공학 원리**
-       - 구동 시뮬레이션 계산 모델에 사용된 주요 물리 수식과 원리를 확인합니다.
-    """)
+    st.markdown("#### 2. 설계안 비교 기능")
+    st.write("- '설계안 비교' 탭으로 이동하여 두 개의 독립된 모델(A, B)을 동시에 구성합니다.")
+    st.write("- 출력된 비교 표와 CSV 다운로드 기능을 통해 팀 프로젝트나 보고서 자료로 활용합니다.")
 
 
 # =========================================================
@@ -1357,27 +1308,13 @@ elif page == "사용 설명서":
 
 elif page == "프로젝트 정보":
     st.markdown(
-        '<div class="section-kicker">06 / ABOUT PROJECT</div>',
+        '<div class="section-kicker">06 / PROJECT INFO</div>',
         unsafe_allow_html=True,
     )
     st.header("프로젝트 정보")
+    st.write("**ROBO LAB | Robot Design Studio**")
+    st.write("고등학교 탐구 활동 및 로봇 공학 입문을 위한 인터랙티브 시뮬레이터입니다.")
+    st.write("- **개발 버전:** V 1.0 (Streamlit)")
+    st.write("- **주요 기술:** Python, Streamlit, SVG Animation, Physics Kinematics")
 
-    st.markdown("""
-    **ROBO LAB | Robot Design Studio v1.0**
-    
-    본 스튜디오는 로봇공학 기초 물리 메커니즘을 시각적으로 학습할 수 있도록 제작된 인터랙티브 교육용 시뮬레이터입니다.
-
-    - **개발 프레임워크**: Python, Streamlit, HTML/CSS/SVG Animations
-    - **핵심 계산**: 차체 역학, 감속기-바퀴 선속도 및 모터 토크, 배터리 소모 전력 모델링
-    """)
-
-
-# ---------------------------------------------------------
-# FOOTER
-# ---------------------------------------------------------
-
-st.markdown("---")
-st.markdown(
-    '<div class="footer">ROBO LAB © 2026. All rights reserved. Designed for Educational Simulation.</div>',
-    unsafe_allow_html=True,
-)
+st.markdown('<div class="footer">ROBO LAB Studio © 2026. All Rights Reserved.</div>', unsafe_allow_html=True)
